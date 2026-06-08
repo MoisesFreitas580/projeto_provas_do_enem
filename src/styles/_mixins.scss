@@ -1,0 +1,102 @@
+// ==========================================================================
+// MIXINS UTILITÁRIOS — Plataforma ENEM
+// ==========================================================================
+@use 'variables' as *;
+
+// ── Scrollbar customizada ──────────────────────────────────────────────────
+@mixin custom-scrollbar {
+  &::-webkit-scrollbar { width: 5px; height: 5px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: $radius-full;
+    &:hover { background: #94a3b8; }
+  }
+}
+
+// ── Card base ─────────────────────────────────────────────────────────────
+@mixin card-base {
+  background: $bg-card;
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  transition: $transition-smooth;
+}
+
+// ── Card hover ────────────────────────────────────────────────────────────
+@mixin card-hover {
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: $shadow-md;
+    border-color: #cbd5e1;
+  }
+}
+
+// ── Seção com título ──────────────────────────────────────────────────────
+@mixin section-header {
+  display: flex;
+  align-items: center;
+  gap: $space-md;
+  margin-bottom: $space-lg;
+  padding-bottom: $space-md;
+  border-bottom: 1px solid $border-color;
+}
+
+// ── Badge ─────────────────────────────────────────────────────────────────
+@mixin badge($color, $bg) {
+  display: inline-flex;
+  align-items: center;
+  font-size: $font-size-xs;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: $radius-sm;
+  color: $color;
+  background-color: $bg;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+// ── Botão primário ────────────────────────────────────────────────────────
+@mixin btn-primary {
+  background: $color-primary;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: $space-sm;
+  box-shadow: $shadow-primary;
+  transition: $transition-smooth;
+
+  &:hover:not(:disabled) {
+    background: $color-primary-dark;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px -4px rgba(15, 118, 110, 0.45);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+// ── Truncate texto ────────────────────────────────────────────────────────
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ── Responsivo ────────────────────────────────────────────────────────────
+@mixin mobile {
+  @media (max-width: 640px) { @content; }
+}
+
+@mixin tablet {
+  @media (max-width: 1024px) { @content; }
+}

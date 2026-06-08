@@ -1,0 +1,86 @@
+<div class="modal-overlay" (click)="close.emit()">
+  <div class="modal-content search-modal" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header">
+      <h2>Buscar Questões</h2>
+      <button class="btn-close" (click)="close.emit()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="filters-bar">
+        <div class="form-group">
+          <label>Área de Conhecimento</label>
+          <select [(ngModel)]="filters.area">
+            <option value="">Todas as Áreas</option>
+            <option value="LC">Linguagens (LC)</option>
+            <option value="CH">Humanas (CH)</option>
+            <option value="CN">Natureza (CN)</option>
+            <option value="MT">Matemática (MT)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ano da Prova</label>
+          <input type="number" [(ngModel)]="filters.year" placeholder="Ex: 2017">
+        </div>
+        <button class="btn-primary" (click)="searchQuestions()" [disabled]="isLoading">
+          <span class="material-symbols-outlined">search</span> Buscar
+        </button>
+      </div>
+
+      <div class="results-container">
+        @if (isLoading) {
+          <div class="state-message">
+            <span class="material-symbols-outlined spinner">sync</span>
+            <p>A procurar no banco de dados...</p>
+          </div>
+        } 
+        @else if (searchResults.length === 0) {
+          <div class="state-message">
+            <p>Utilize os filtros acima para procurar questões para adicionar.</p>
+          </div>
+        } 
+        @else {
+          <div class="questions-list">
+            @for (q of searchResults; track q.id) {
+              <label class="question-item" [class.selected]="selectedQuestions.has(q.id)">
+                
+                <div class="checkbox-wrapper">
+                  <input type="checkbox" 
+                         [checked]="selectedQuestions.has(q.id)" 
+                         (change)="toggleSelection(q.id)">
+                </div>
+                
+                <div class="q-content">
+                  <div class="badges">
+                    <span class="badge-area">{{ q.area || 'Geral' }}</span>
+                    @if (q.exam?.year) { <span class="badge-year">ENEM {{ q.exam.year }}</span> }
+                  </div>
+                  <p class="q-text">
+                    {{ (q.rawJson?.comando | slice:0:150) || 'Questão sem enunciado principal mapeado...' }}...
+                  </p>
+                  <small class="q-id">ID: {{ q.id }}</small>
+                </div>
+
+              </label>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <div class="selection-count">
+        {{ selectedQuestions.size }} selecionada(s)
+      </div>
+      <div class="actions">
+        <button class="btn-secondary" (click)="close.emit()">Cancelar</button>
+        <button class="btn-primary" [disabled]="selectedQuestions.size === 0" (click)="confirmSelection()">
+          Adicionar ao Simulado
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

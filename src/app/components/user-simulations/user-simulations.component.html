@@ -1,0 +1,97 @@
+<section class="user-simulations-section">
+
+  <div class="section-header">
+    <div class="title-block">
+      <p class="section-label">Meu progresso</p>
+      <h2>Minhas Simulações</h2>
+    </div>
+    <button class="btn-create" (click)="openModal()">
+      <span class="material-icons">add</span>
+      <span>Nova Simulação</span>
+    </button>
+  </div>
+
+  <div class="simulations-grid">
+
+    @for (sim of userSimulations$ | async; track sim.id) {
+    <div class="simulation-card">
+
+      <div class="card-top">
+        <div class="sim-icon-wrap">
+          <span class="material-icons">assignment</span>
+        </div>
+        <h3 class="sim-title">{{ getDisplayTitle(sim) }}</h3>
+      </div>
+
+      <div class="badges-row">
+        @if (sim.filters?.area) {
+        <span class="badge badge-area">{{ sim.filters!.area }}</span>
+        }
+        @if (sim.filters?.competencyCode) {
+        <span class="badge badge-comp">C{{ sim.filters!.competencyCode }}</span>
+        }
+        @if (sim.filters?.skillCode) {
+        <span class="badge badge-skill">H{{ sim.filters!.skillCode }}</span>
+        }
+        @if (sim.filters?.day) {
+        <span class="badge badge-day">{{ sim.filters!.day }}</span>
+        }
+        @if (sim.filters?.year) {
+        <span class="badge badge-year">{{ sim.filters!.year }}</span>
+        }
+        @if (filterCount(sim.filters) === 0) {
+        <span class="badge badge-empty">Geral</span>
+        }
+      </div>
+
+      <div class="stats-row">
+        <div class="stat">
+          <span class="material-symbols-outlined stat-icon blue">quiz</span>
+          <span class="stat-value">{{ sim.questionsCount }}</span>
+          <span class="stat-label">questões</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="material-symbols-outlined stat-icon muted">replay</span>
+          <span class="stat-value">{{ sim.attemptsCount }}</span>
+          <span class="stat-label">tentativas</span>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn-action view" title="Ver / Praticar">
+          <span class="material-symbols-outlined">visibility</span>
+          <span>Praticar</span>
+        </button>
+
+        <div class="action-group">
+          <button class="btn-icon edit" [routerLink]="['/simulations', sim.id]" title="Editar">
+            <span class="material-symbols-outlined">edit</span>
+          </button>
+          <button class="btn-icon delete" (click)="deleteSimulation(sim.id, $event)" title="Remover">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+    } @empty {
+    <div class="empty-state">
+      <div class="empty-icon-wrap">
+        <span class="material-icons">auto_stories</span>
+      </div>
+      <p class="empty-title">Nenhuma simulação criada</p>
+      <p class="empty-sub">Crie o seu primeiro simulado personalizado e comece a treinar.</p>
+      <button class="btn-create-empty" (click)="openModal()">
+        <span class="material-icons">add</span>
+        Criar primeiro simulado
+      </button>
+    </div>
+    }
+
+  </div>
+</section>
+
+@if (isModalOpen) {
+<app-create-simulation-modal (close)="closeModal($event)"></app-create-simulation-modal>
+}

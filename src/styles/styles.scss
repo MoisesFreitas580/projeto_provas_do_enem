@@ -1,0 +1,51 @@
+// 1. Importação do Angular Material 3
+@use '@angular/material' as mat;
+
+// 2. Importação do seu Design System Global (Variáveis e Mixins)
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// 3. Configuração unificada do Tema do Angular Material 3
+html {
+  @include mat.theme(
+    (
+      color: (
+        // Se você escolheu a Opção 1 (Índigo) das sugestões anteriores,
+        // pode trocar aqui para mat.$indigo-palette
+        primary: mat.$azure-palette, 
+        tertiary: mat.$blue-palette,
+      ),
+      typography: 'Open Sans', // Corrigido aqui para alinhar com o resto do seu app!
+      density: 0,
+    )
+  );
+}
+
+// 4. Reset e Estruturação Base do Documento (Sem duplicados)
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: 'Open Sans', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  // Define o esquema de cores padrão como claro
+  color-scheme: light;
+
+  // Vincula o fundo e a cor do texto ao ecossistema do Material 3
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  
+  // Se quiser usar a sua cor customizada de fundo que definimos no variables.scss,
+  // basta descomentar a linha abaixo:
+  // background-color: $color-bg-main;
+}
+
+// 5. Reset Global de Dimensionamento (Box Model)
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}

@@ -1,0 +1,265 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: $space-lg;
+    box-sizing: border-box;
+}
+
+.search-modal {
+    background: $bg-card;
+    width: 100%;
+    max-width: 850px;
+    height: 85vh; 
+    display: flex;
+    flex-direction: column;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-lg;
+    animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $space-lg $space-xl;
+    border-bottom: 1px solid $border-color;
+
+    h2 {
+        margin: 0;
+        font-size: $font-size-xl;
+        color: $text-heading;
+    }
+
+    .btn-close {
+        background: transparent;
+        border: none;
+        color: $text-muted;
+        cursor: pointer;
+        padding: 6px;
+        border-radius: $radius-sm;
+        transition: $transition-fast;
+
+        &:hover {
+            background: $bg-subtle;
+            color: $color-danger;
+        }
+    }
+}
+
+.modal-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: $space-xl;
+    gap: $space-lg;
+}
+
+.filters-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: $space-md;
+    background: $bg-subtle;
+    padding: $space-md;
+    border-radius: $radius-md;
+    border: 1px solid $border-color;
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1;
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: $text-muted;
+        }
+
+        input,
+        select {
+            padding: 10px;
+            border: 1px solid $border-color;
+            border-radius: $radius-sm;
+            font-family: inherit;
+            font-size: 14px;
+
+            &:focus {
+                outline: none;
+                border-color: $color-primary;
+            }
+        }
+    }
+
+    .btn-primary {
+        @include btn-primary;
+        height: 42px;
+    }
+}
+
+.results-container {
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    background: white;
+    @include custom-scrollbar;
+
+    .state-message {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: $text-muted;
+
+        .spinner {
+            font-size: 36px;
+            color: $color-primary;
+            animation: spin 1s linear infinite;
+            margin-bottom: 12px;
+        }
+    }
+}
+
+.questions-list {
+    display: flex;
+    flex-direction: column;
+
+    .question-item {
+        display: flex;
+        gap: $space-md;
+        padding: $space-md;
+        border-bottom: 1px solid $border-color;
+        cursor: pointer;
+        transition: $transition-fast;
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        &:hover {
+            background: $bg-subtle;
+        }
+
+        &.selected {
+            background: $color-primary-pale;
+            border-left: 3px solid $color-primary;
+
+            .q-content .q-id {
+                color: $color-primary;
+            }
+        }
+
+        .checkbox-wrapper {
+            padding-top: 4px;
+
+            input {
+                cursor: pointer;
+                width: 18px;
+                height: 18px;
+                accent-color: $color-primary;
+            }
+        }
+
+        .q-content {
+            flex: 1;
+
+            .badges {
+                display: flex;
+                gap: 8px;
+                margin-bottom: 8px;
+
+                .badge-area {
+                    @include badge($badge-area-color, $badge-area-bg);
+                }
+
+                .badge-year {
+                    @include badge($badge-year-color, $badge-year-bg);
+                }
+            }
+
+            .q-text {
+                margin: 0 0 8px 0;
+                font-size: 14px;
+                color: $text-heading;
+                line-height: 1.5;
+            }
+
+            .q-id {
+                font-size: 12px;
+                color: $text-placeholder;
+                font-family: monospace;
+            }
+        }
+    }
+}
+
+.modal-footer {
+    padding: $space-md $space-xl;
+    border-top: 1px solid $border-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: $bg-subtle;
+    border-radius: 0 0 $radius-lg $radius-lg;
+
+    .selection-count {
+        font-size: 14px;
+        font-weight: 700;
+        color: $color-primary;
+    }
+
+    .actions {
+        display: flex;
+        gap: $space-md;
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid $border-color;
+            color: $text-body;
+            padding: 10px 20px;
+            border-radius: $radius-md;
+            cursor: pointer;
+            font-weight: 600;
+
+            &:hover {
+                background: #e2e8f0;
+            }
+        }
+
+        .btn-primary {
+            @include btn-primary;
+        }
+    }
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}

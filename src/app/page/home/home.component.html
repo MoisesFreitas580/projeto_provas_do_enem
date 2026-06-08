@@ -1,0 +1,49 @@
+<main class="dashboard-container">
+  <section class="welcome-hero">
+    <div class="hero-body">
+      <img src="app/assets/logo-branca.png" alt="Logo IFCE" class="app-logo-mini">
+      <h1>Estude para o ENEM por Competências</h1>
+      <p>Treine com um banco de questões atualizado, simulados interativos e relatórios de desempenho completos criados para o seu sucesso.</p>
+    </div>
+  </section>
+
+  <section class="grid-section">
+    <div class="section-title-bar">
+      <h2>Áreas do Conhecimento</h2>
+      <span class="subtitle">Selecione uma categoria para iniciar os seus treinos</span>
+    </div>
+
+    <div class="cards-grid">
+      @for (area of knowledgeAreas$ | async; track area.id) {
+        <div class="area-card" [class]="'area-' + area.code" [routerLink]="['/area', area.id]">
+          <div class="card-header-row">
+            <div class="icon-box">
+              <span class="material-icons">{{ area.icon }}</span>
+            </div>
+            <span class="area-tag">{{ area.code }}</span>
+          </div>
+          
+          <div class="card-body">
+            <h3>{{ area.name }}</h3>
+          </div>
+
+          <div class="card-footer">
+            <span class="action-text">Aceder à área</span>
+            <span class="material-icons arrow">chevron_right</span>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-icons spinning">sync</span>
+          <p>A carregar os seus conteúdos de estudo...</p>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="simulations-layout">
+    <app-user-simulations></app-user-simulations>
+  </section>
+</main>
+
+<app-footer></app-footer>

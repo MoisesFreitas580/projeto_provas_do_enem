@@ -1,0 +1,128 @@
+<header class="app-header">
+
+  <!-- Logo -->
+  <a class="logo-container" routerLink="/">
+    <img src="app/assets/logo-branca.png" alt="IFCE" class="logo">
+  </a>
+
+  <!-- Ações — visíveis apenas quando logado -->
+  @if (isLogged) {
+    <div class="header-actions">
+
+      <!-- Botão criar simulado -->
+      <button class="btn-create-simulado">
+        <span class="material-icons">add</span>
+        <span>Criar simulado</span>
+      </button>
+
+      <!-- Menu de áreas (grid) -->
+      <div class="menu-container">
+        <button
+          class="btn-icon"
+          (click)="toggleMenu()"
+          [class.active]="menuAberto"
+          aria-label="Menu de navegação"
+        >
+          <span class="material-icons">apps</span>
+        </button>
+
+        @if (menuAberto) {
+          <div class="dropdown-menu">
+            <button class="menu-card-performance">
+              <div class="icon-wrapper badge-teal">
+                <span class="material-icons">trending_up</span>
+              </div>
+              <div class="perf-text">
+                <span class="label">Meu desempenho</span>
+                <span class="sublabel">Relatórios e estatísticas</span>
+              </div>
+              <span class="material-icons arrow-icon">chevron_right</span>
+            </button>
+
+            <p class="menu-section-label">Áreas do conhecimento</p>
+            <div class="menu-section">
+              <button class="menu-item">
+                <div class="icon-wrapper badge-rose">
+                  <span class="material-icons">language</span>
+                </div>
+                <span class="label">Linguagens e Códigos</span>
+              </button>
+              <button class="menu-item">
+                <div class="icon-wrapper badge-blue">
+                  <span class="material-icons">calculate</span>
+                </div>
+                <span class="label">Matemática</span>
+              </button>
+              <button class="menu-item">
+                <div class="icon-wrapper badge-orange">
+                  <span class="material-icons">public</span>
+                </div>
+                <span class="label">Ciências Humanas</span>
+              </button>
+              <button class="menu-item">
+                <div class="icon-wrapper badge-green">
+                  <span class="material-icons">eco</span>
+                </div>
+                <span class="label">Ciências da Natureza</span>
+              </button>
+            </div>
+
+            <div class="dropdown-divider"></div>
+
+            <div class="menu-section">
+              <button class="menu-item footer-item">
+                <div class="icon-wrapper badge-slate">
+                  <span class="material-icons">auto_stories</span>
+                </div>
+                <span class="label">Matriz de Referência</span>
+              </button>
+              <button class="menu-item footer-item">
+                <div class="icon-wrapper badge-slate">
+                  <span class="material-icons">info</span>
+                </div>
+                <span class="label">Sobre nós</span>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Avatar e menu de perfil -->
+      <div class="profile-container" (click)="toggleUserMenu()">
+        <div class="avatar">{{ userInitial }}</div>
+
+        @if (userMenuOpen) {
+          <div class="user-dropdown">
+            <div class="user-info">
+              <div class="user-avatar-lg">{{ userInitial }}</div>
+              <div>
+                <p class="user-name">{{ userName }}</p>
+                <p class="user-role">Estudante</p>
+              </div>
+            </div>
+
+            <div class="dropdown-divider"></div>
+
+            <button class="user-menu-item">
+              <span class="material-icons">person_outline</span>
+              <span>Meu perfil</span>
+            </button>
+            <button class="user-menu-item">
+              <span class="material-icons">settings</span>
+              <span>Configurações</span>
+            </button>
+
+            <div class="dropdown-divider"></div>
+
+            <button class="user-menu-item logout-item" (click)="logout()">
+              <span class="material-icons">logout</span>
+              <span>Sair da conta</span>
+            </button>
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+
+</header>

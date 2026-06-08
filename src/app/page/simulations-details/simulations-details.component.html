@@ -1,0 +1,106 @@
+<div class="details-container">
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <span class="material-symbols-outlined spinner">sync</span>
+      <p>A carregar detalhes do simulado...</p>
+    </div>
+  } @else {
+
+    <header class="page-header">
+      <div class="header-content">
+        <button class="btn-back" routerLink="/">
+          <span class="material-symbols-outlined">arrow_back</span> Voltar ao Dashboard
+        </button>
+        
+        <div class="title-row">
+          <h1 class="page-title">{{ simulationDetails?.title || 'Simulado Personalizado' }}</h1>
+          <span class="badge badge-primary">{{ questions.length }} questões</span>
+        </div>
+        
+        <p class="page-subtitle">
+          Faça a gestão do seu simulado. Adicione novas questões, remova ou previsualize o conteúdo antes de iniciar a sua sessão de estudo.
+        </p>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn-secondary" (click)="openAddQuestionsSearch()">
+          <span class="material-symbols-outlined">search</span> Adicionar Questões
+        </button>
+        
+        <button class="btn-primary" [routerLink]="['/simulations', simulationId, 'practice']" [disabled]="questions.length === 0">
+          <span class="material-symbols-outlined">play_arrow</span> Praticar Simulado
+        </button>
+      </div>
+    </header>
+
+    <section class="questions-section">
+      <div class="section-title-bar">
+        <h2>Conteúdo do Simulado</h2>
+      </div>
+
+      <div class="questions-list">
+        @for (item of questions; track item.id || item.question?.id; let i = $index) {
+          
+          <div class="question-card">
+            <div class="q-info">
+              
+              <div class="q-details">
+                <h4>Questão {{ item.question?.number }}</h4>
+                <div class="q-badges">
+                  <span class="badge-area">{{ item.question?.area || 'Geral' }}</span>
+                  
+                  @if (item.question?.skillCode) {
+                    <span class="badge-skill">Habilidade {{ item.question.skillCode }}</span>
+                  }
+                  @if (item.question?.exam?.year) {
+                    <span class="badge-year">ENEM {{ item.question.exam.year }}</span>
+                  }
+                </div>
+              </div>
+            </div>
+            
+            <div class="q-actions">
+              <button class="btn-icon view" (click)="openQuestionPreview(item)" title="Previsualizar Questão">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+              <button class="btn-icon delete" (click)="removeQuestion(item.question?.id || item.id)" title="Remover do Simulado">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </div>
+
+        } @empty {
+          
+          <div class="empty-state">
+            <div class="empty-icon-wrap">
+              <span class="material-symbols-outlined">assignment_late</span>
+            </div>
+            <h3>O seu simulado está vazio</h3>
+            <p>Este simulado ainda não possui nenhuma questão atrelada a ele.</p>
+            <button class="btn-secondary" (click)="openAddQuestionsSearch()">
+              Buscar e adicionar questões
+            </button>
+          </div>
+
+        }
+      </div>
+    </section>
+
+  }
+
+</div>
+
+@if (isPreviewModalOpen) {
+  <app-question-preview 
+    [questionId]="previewQuestionId" 
+    (close)="closePreviewModal()">
+  </app-question-preview>
+}
+
+@if (isSearchModalOpen) {
+  <app-question-search-modal 
+    (close)="closeSearchModal()" 
+    (addSelected)="addSelectedQuestions($event)">
+  </app-question-search-modal>
+}

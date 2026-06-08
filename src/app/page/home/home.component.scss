@@ -1,0 +1,225 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+
+.dashboard-container {
+  background-color: $bg-app;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+
+.welcome-hero {
+  background: linear-gradient(135deg, #0f766e 0%, #0d5e57 100%);
+  padding: 56px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+
+ 
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.04) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .hero-body {
+    max-width: 680px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .app-logo-mini {
+    height: 120px;
+    width: auto;
+    object-fit: contain;
+    margin-bottom: $space-lg;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
+  }
+
+  h1 {
+    font-size: $font-size-2xl;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 12px;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+
+    @include mobile { font-size: $font-size-xl; }
+  }
+
+  p {
+    font-size: $font-size-md;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.65;
+    margin: 0;
+  }
+}
+
+.grid-section {
+  max-width: $max-width-content;
+  width: 100%;
+  margin: $space-xl auto 0;
+  padding: 0 $space-lg;
+}
+
+.section-title-bar {
+  margin-bottom: $space-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+
+  h2 {
+    font-size: $font-size-sm;
+    font-weight: 700;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0;
+  }
+
+  .subtitle {
+    font-size: $font-size-md;
+    font-weight: 600;
+    color: $text-heading;
+  }
+}
+
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-lg;
+
+  @include tablet { grid-template-columns: repeat(2, 1fr); }
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.area-card {
+  @include card-base;
+  padding: $space-lg;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 200px;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+
+    .card-footer .arrow { transform: translateX(5px); }
+  }
+
+  .card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: $space-lg;
+  }
+
+  .icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .material-icons { font-size: 22px; }
+  }
+
+  .area-tag {
+    @include badge($text-muted, $bg-subtle);
+    font-size: $font-size-xs;
+    border: 1px solid $border-color;
+  }
+
+  .card-body {
+    flex: 1;
+
+    h3 {
+      font-size: $font-size-md;
+      font-weight: 700;
+      color: $text-heading;
+      margin: 0;
+      line-height: 1.35;
+    }
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    margin-top: $space-md;
+    font-size: $font-size-sm;
+    font-weight: 700;
+
+    .arrow {
+      font-size: 16px;
+      transition: transform 0.2s ease;
+    }
+  }
+
+  &.area-LC {
+    .icon-box { background: $area-lc-bg; color: $area-lc-color; }
+    .card-footer { color: $area-lc-color; }
+    &:hover { border-color: rgba($area-lc-color, 0.4); }
+  }
+
+  &.area-MT {
+    .icon-box { background: $area-mt-bg; color: $area-mt-color; }
+    .card-footer { color: $area-mt-color; }
+    &:hover { border-color: rgba($area-mt-color, 0.4); }
+  }
+
+  &.area-CH {
+    .icon-box { background: $area-ch-bg; color: $area-ch-color; }
+    .card-footer { color: $area-ch-color; }
+    &:hover { border-color: rgba($area-ch-color, 0.4); }
+  }
+
+  &.area-CN {
+    .icon-box { background: $area-cn-bg; color: $area-cn-color; }
+    .card-footer { color: $area-cn-color; }
+    &:hover { border-color: rgba($area-cn-color, 0.4); }
+  }
+}
+
+.simulations-layout {
+  width: 100%;
+  max-width: $max-width-content;
+  margin: $space-xl auto $space-xxl;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  background: $bg-card;
+  border: 1.5px dashed $border-color;
+  border-radius: $radius-lg;
+  padding: 52px;
+  text-align: center;
+  color: $text-muted;
+
+  .spinning {
+    animation: spin 1.2s linear infinite;
+    font-size: 28px;
+    margin-bottom: $space-sm;
+    color: $color-primary;
+    display: block;
+  }
+
+  p { font-size: $font-size-md; margin: 0; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}

@@ -1,0 +1,203 @@
+<div class="login-container">
+
+  <div class="brand-side">
+    <div class="brand-content">
+      <div class="logo-wrapper">
+        <span class="material-icons logo-icon">school</span>
+        <span class="logo-text">Plataforma ENEM</span>
+      </div>
+
+      <div class="marketing-text">
+        <h2>A sua preparação de forma inteligente e direcionada.</h2>
+        <p>Aceda aos seus simulados customizados, analise o seu desempenho real por habilidades e organize os seus estudos numa matriz de referência moderna.</p>
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <span class="material-icons">check_circle</span>
+          <span>Banco de questões atualizado por área</span>
+        </div>
+        <div class="feature-item">
+          <span class="material-icons">check_circle</span>
+          <span>Simulados personalizados por competência</span>
+        </div>
+        <div class="feature-item">
+          <span class="material-icons">check_circle</span>
+          <span>Relatórios de desempenho completos</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="brand-footer">
+      <p>© 2026 Plataforma Educacional. Todos os direitos reservados.</p>
+    </div>
+  </div>
+
+  <div class="form-side">
+    <div class="form-wrapper">
+
+      <div class="tab-switcher">
+        <button
+          class="tab-btn"
+          [class.active]="activeTab === 'login'"
+          (click)="setTab('login')"
+        >Entrar</button>
+        <button
+          class="tab-btn"
+          [class.active]="activeTab === 'register'"
+          (click)="setTab('register')"
+        >Criar conta</button>
+        <div class="tab-indicator" [class.right]="activeTab === 'register'"></div>
+      </div>
+
+      @if (loginError) {
+        <div class="error-alert animate-fade">
+          <span class="material-icons">error_outline</span>
+          <span>{{ loginError }}</span>
+        </div>
+      }
+
+      @if (successMessage) {
+        <div class="success-alert animate-fade">
+          <span class="material-icons">check_circle_outline</span>
+          <span>{{ successMessage }}</span>
+        </div>
+      }
+
+      @if (activeTab === 'login') {
+        <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="auth-form">
+
+          <div class="input-group" [class.has-error]="isInvalid(loginForm, 'email')">
+            <label for="login-email">E-mail</label>
+            <div class="input-container">
+              <span class="material-icons input-icon">mail_outline</span>
+              <input
+                type="email"
+                id="login-email"
+                formControlName="email"
+                placeholder="exemplo@email.com"
+                autocomplete="email"
+              />
+            </div>
+            @if (isInvalid(loginForm, 'email')) {
+              <span class="error-message">Introduza um e-mail válido</span>
+            }
+          </div>
+
+          <div class="input-group" [class.has-error]="isInvalid(loginForm, 'password')">
+            <div class="label-row">
+              <label for="login-password">Palavra-passe</label>
+            </div>
+            <div class="input-container">
+              <span class="material-icons input-icon">lock_outline</span>
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="login-password"
+                formControlName="password"
+                placeholder="A sua palavra-passe"
+                autocomplete="current-password"
+              />
+              <button type="button" class="btn-toggle-password" (click)="togglePassword()" tabindex="-1">
+                <span class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+            @if (isInvalid(loginForm, 'password')) {
+              <span class="error-message">A senha deve ter pelo menos 6 caracteres</span>
+            }
+          </div>
+
+          <div class="remember-row">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="rememberMe" />
+              <span class="checkmark"></span>
+              <span>Lembrar-me neste dispositivo</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-submit" [disabled]="loginForm.invalid || isLoading">
+            @if (isLoading) {
+              <span class="material-icons spinner">sync</span>
+              <span>A autenticar...</span>
+            } @else {
+              <span>Entrar na conta</span>
+              <span class="material-icons">arrow_forward</span>
+            }
+          </button>
+
+        </form>
+      }
+
+      @if (activeTab === 'register') {
+        <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="auth-form">
+
+          <div class="input-group" [class.has-error]="isInvalid(registerForm, 'name')">
+            <label for="reg-name">Nome completo</label>
+            <div class="input-container">
+              <span class="material-icons input-icon">person_outline</span>
+              <input
+                type="text"
+                id="reg-name"
+                formControlName="name"
+                placeholder="O seu nome"
+                autocomplete="name"
+              />
+            </div>
+            @if (isInvalid(registerForm, 'name')) {
+              <span class="error-message">Nome obrigatório</span>
+            }
+          </div>
+
+          <div class="input-group" [class.has-error]="isInvalid(registerForm, 'email')">
+            <label for="reg-email">E-mail</label>
+            <div class="input-container">
+              <span class="material-icons input-icon">mail_outline</span>
+              <input
+                type="email"
+                id="reg-email"
+                formControlName="email"
+                placeholder="exemplo@email.com"
+                autocomplete="email"
+              />
+            </div>
+            @if (isInvalid(registerForm, 'email')) {
+              <span class="error-message">Introduza um e-mail válido</span>
+            }
+          </div>
+
+          <div class="input-group" [class.has-error]="isInvalid(registerForm, 'password')">
+            <label for="reg-password">Palavra-passe</label>
+            <div class="input-container">
+              <span class="material-icons input-icon">lock_outline</span>
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="reg-password"
+                formControlName="password"
+                placeholder="Mínimo 6 caracteres"
+                autocomplete="new-password"
+              />
+              <button type="button" class="btn-toggle-password" (click)="togglePassword()" tabindex="-1">
+                <span class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+            @if (isInvalid(registerForm, 'password')) {
+              <span class="error-message">A senha deve ter pelo menos 6 caracteres</span>
+            }
+          </div>
+
+          <button type="submit" class="btn-submit" [disabled]="registerForm.invalid || isLoading">
+            @if (isLoading) {
+              <span class="material-icons spinner">sync</span>
+              <span>A criar conta...</span>
+            } @else {
+              <span>Criar conta grátis</span>
+              <span class="material-icons">arrow_forward</span>
+            }
+          </button>
+
+        </form>
+      }
+
+    </div>
+  </div>
+
+</div>

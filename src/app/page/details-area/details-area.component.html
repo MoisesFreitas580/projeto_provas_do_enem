@@ -1,0 +1,133 @@
+<div class="area-container">
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <span class="material-icons spinner">sync</span>
+      <p>A carregar a matriz de referência...</p>
+    </div>
+  } @else {
+
+    <header class="page-header">
+      <div class="header-content">
+        <div class="area-badge">Matriz de Referência</div>
+        <h1 class="page-title">{{ areaDetails?.name || 'Área não encontrada' }}</h1>
+        <p class="page-subtitle">
+          Explore as disciplinas, competências e habilidades associadas a esta área do conhecimento.
+        </p>
+      </div>
+
+      <div class="header-stats">
+        <div class="stat-pill">
+          <span class="material-icons">menu_book</span>
+          <strong>{{ disciplines.length }}</strong>
+          <span>disciplinas</span>
+        </div>
+        <div class="stat-pill">
+          <span class="material-icons">psychology</span>
+          <strong>{{ competencies.length }}</strong>
+          <span>competências</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="catalog-section">
+      <div class="section-header">
+        <div class="section-icon blue">
+          <span class="material-icons">menu_book</span>
+        </div>
+        <div>
+          <h2>Disciplinas</h2>
+          <p>Objetos de conhecimento por disciplina</p>
+        </div>
+        <span class="badge-count">{{ disciplines.length }}</span>
+      </div>
+
+      <div class="accordion-list">
+        @for (discipline of disciplines; track discipline.id) {
+          <div class="accordion-item" [class.open]="discipline.showObjects">
+
+            <button class="accordion-trigger" (click)="toggleKnowledgeObjects(discipline)">
+              <div class="trigger-left">
+                <span class="trigger-icon">
+                  <span class="material-icons">folder_open</span>
+                </span>
+                <span class="trigger-title">{{ discipline.name }}</span>
+              </div>
+              <span class="material-icons chevron">expand_more</span>
+            </button>
+
+            @if (discipline.showObjects) {
+              <div class="accordion-body slide-down">
+                <ul class="knowledge-list">
+                  @for (obj of discipline.knowledgeObjects; track obj.id) {
+                    <li class="knowledge-item">
+                      <span class="dot"></span>
+                      {{ obj.name }}
+                    </li>
+                  } @empty {
+                    <li class="empty-row">
+                      <span class="material-icons">hourglass_empty</span>
+                      Nenhum objeto de conhecimento registrado.
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="catalog-section">
+      <div class="section-header">
+        <div class="section-icon green">
+          <span class="material-icons">psychology</span>
+        </div>
+        <div>
+          <h2>Competências & Habilidades</h2>
+          <p>Expand para ver as habilidades associadas</p>
+        </div>
+        <span class="badge-count">{{ competencies.length }}</span>
+      </div>
+
+      <div class="accordion-list">
+        @for (comp of competencies; track comp.id) {
+          <div class="accordion-item" [class.open]="comp.showSkills">
+
+            <button class="accordion-trigger" (click)="toggleSkills(comp)">
+              <div class="trigger-left">
+                <span class="comp-code">C{{ comp.code }}</span>
+                <span class="trigger-title">Competência {{ comp.code }}</span>
+              </div>
+              <div class="trigger-right">
+                <span class="skills-count">{{ comp.skills.length }} hab.</span>
+                <span class="material-icons chevron">expand_more</span>
+              </div>
+            </button>
+
+            <p class="comp-description">{{ comp.description }}</p>
+
+            @if (comp.showSkills) {
+              <div class="accordion-body slide-down">
+                <ul class="skills-list">
+                  @for (skill of comp.skills; track skill.id) {
+                    <li class="skill-item">
+                      <span class="skill-code">{{ skill.code }}</span>
+                      <p class="skill-desc">{{ skill.description }}</p>
+                    </li>
+                  } @empty {
+                    <li class="empty-row">
+                      <span class="material-icons">hourglass_empty</span>
+                      Nenhuma habilidade associada.
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </section>
+
+  }
+</div>

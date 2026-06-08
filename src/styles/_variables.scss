@@ -1,0 +1,98 @@
+// ==========================================================================
+// DESIGN TOKENS — Plataforma ENEM
+// Fonte única da verdade para todo o sistema visual.
+// Importe com: @use 'variables' as *;
+// ==========================================================================
+
+// ── Paleta base ────────────────────────────────────────────────────────────
+$color-primary:        #0f766e;   // Teal principal
+$color-primary-light:  #14b8a6;   // Teal hover / destaque
+$color-primary-pale:   #f0fdfa;   // Fundo teal suave
+$color-primary-dark:   #0d5e57;   // Teal escuro (hover forte)
+
+// ── Áreas do conhecimento ──────────────────────────────────────────────────
+$area-lc-color:        #f43f5e;
+$area-lc-bg:           #fff1f2;
+$area-mt-color:        #3b82f6;
+$area-mt-bg:           #eff6ff;
+$area-ch-color:        #f97316;
+$area-ch-bg:           #fff7ed;
+$area-cn-color:        #10b981;
+$area-cn-bg:           #f0fdf4;
+
+// ── Superfícies ────────────────────────────────────────────────────────────
+$bg-app:               #f1f5f9;   // Fundo geral (slate-100)
+$bg-card:              #ffffff;
+$bg-subtle:            #f8fafc;   // Fundo interno de itens (slate-50)
+
+// ── Texto ──────────────────────────────────────────────────────────────────
+$text-heading:         #0f172a;   // Slate-900
+$text-body:            #334155;   // Slate-700
+$text-muted:           #64748b;   // Slate-500
+$text-placeholder:     #94a3b8;   // Slate-400
+
+// ── Bordas ─────────────────────────────────────────────────────────────────
+$border-color:         #e2e8f0;   // Slate-200
+$border-focus:         $color-primary;
+
+// ── Feedback ───────────────────────────────────────────────────────────────
+$color-success:        #10b981;
+$color-success-pale:   #ecfdf5;
+$color-danger:         #ef4444;
+$color-danger-pale:    #fef2f2;
+$color-warn:           #f59e0b;
+$color-warn-pale:      #fffbeb;
+
+// ── Badges / filtros ───────────────────────────────────────────────────────
+$badge-area-color:     #2563eb;
+$badge-area-bg:        #eff6ff;
+$badge-comp-color:     #16a34a;
+$badge-comp-bg:        #f0fdf4;
+$badge-skill-color:    #ea580c;
+$badge-skill-bg:       #fff7ed;
+$badge-day-color:      #7c3aed;
+$badge-day-bg:         #f5f3ff;
+$badge-year-color:     #0369a1;
+$badge-year-bg:        #f0f9ff;
+$badge-empty-color:    #475569;
+$badge-empty-bg:       #f1f5f9;
+
+// ── Espaçamento ────────────────────────────────────────────────────────────
+$space-xs:   4px;
+$space-sm:   8px;
+$space-md:   16px;
+$space-lg:   24px;
+$space-xl:   40px;
+$space-xxl:  64px;
+
+// ── Bordas arredondadas ────────────────────────────────────────────────────
+$radius-xs:  4px;
+$radius-sm:  6px;
+$radius-md:  10px;
+$radius-lg:  14px;
+$radius-xl:  20px;
+$radius-full: 9999px;
+
+// ── Sombras ────────────────────────────────────────────────────────────────
+$shadow-xs:  0 1px 2px rgba(15, 23, 42, 0.04);
+$shadow-sm:  0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+$shadow-md:  0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
+$shadow-lg:  0 20px 32px -8px rgba(15, 23, 42, 0.12), 0 8px 12px rgba(15, 23, 42, 0.06);
+$shadow-primary: 0 8px 20px -4px rgba(15, 118, 110, 0.35);
+
+// ── Tipografia ─────────────────────────────────────────────────────────────
+$font-family:  'Open Sans', system-ui, -apple-system, sans-serif;
+$font-size-xs: 11px;
+$font-size-sm: 13px;
+$font-size-md: 15px;
+$font-size-lg: 18px;
+$font-size-xl: 24px;
+$font-size-2xl: 30px;
+
+// ── Transições ─────────────────────────────────────────────────────────────
+$transition-fast:   all 0.15s ease;
+$transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+// ── Layout ─────────────────────────────────────────────────────────────────
+$max-width-content: 1200px;
+$header-height:     64px;

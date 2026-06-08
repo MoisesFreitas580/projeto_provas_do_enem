@@ -4,12 +4,16 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
+    "rootDir": "./src",
     "types": [
       "node"
     ]
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "src/app/components/questions-preview/questions-preview.component.ts",
+    "src/app/components/question-search-modal/question-search-modal.component.ts",
+    "src/app/components/footer/footer.component.ts"
   ],
   "exclude": [
     "src/**/*.spec.ts"
