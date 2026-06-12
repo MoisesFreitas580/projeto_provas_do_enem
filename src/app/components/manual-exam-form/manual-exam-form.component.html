@@ -1,0 +1,90 @@
+<div class="form-section">
+  <p class="form-section-label">
+    <span class="material-icons">search</span>
+    Pesquisar Questões
+  </p>
+
+  <div class="search-row">
+    <select [(ngModel)]="searchArea" class="search-select">
+      <option value="">Todas as áreas</option>
+      <option value="LC">Linguagens (LC)</option>
+      <option value="CH">Humanas (CH)</option>
+      <option value="CN">Natureza (CN)</option>
+      <option value="MT">Matemática (MT)</option>
+    </select>
+    <input
+      type="number"
+      [(ngModel)]="searchYear"
+      placeholder="Ano (ex: 2021)"
+      class="search-year"
+    />
+    <button class="btn-search" (click)="search()" [disabled]="isSearching">
+      @if (isSearching) {
+        <span class="material-icons spin">sync</span>
+      } @else {
+        <span class="material-icons">search</span>
+      }
+      <span>{{ isSearching ? 'Buscando...' : 'Buscar' }}</span>
+    </button>
+  </div>
+
+  <div class="results-list">
+    @for (q of searchResults; track q.id) {
+      <label class="result-card" [class.selected]="selectedIds.has(q.id)">
+        <input
+          type="checkbox"
+          [checked]="selectedIds.has(q.id)"
+          (change)="toggle(q.id)"
+        />
+        <div class="r-info">
+          <div class="r-badges">
+            <span class="badge-area">{{ q.area }}</span>
+            @if (q.exam?.year) { <span class="badge-year">{{ q.exam.year }}</span> }
+            @if (q.exam?.type) { <span class="badge-type">{{ q.exam.type }}</span> }
+            @if (q.skill?.code) { <span class="badge-skill">{{ q.skill.code }}</span> }
+          </div>
+          <p class="r-preview">{{ q.rawJson?.comando || ('Questão ' + q.number) }}</p>
+        </div>
+        <button class="btn-eye" (click)="openPreview(q.id, $event)" title="Pré-visualizar">
+          <span class="material-icons">visibility</span>
+        </button>
+      </label>
+    } @empty {
+      @if (!isSearching) {
+        <div class="empty-results">
+          <span class="material-icons">manage_search</span>
+          <p>Use os filtros acima e clique em Buscar.</p>
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<div class="form-section">
+  <p class="form-section-label" [class.has-items]="selectedIds.size > 0">
+    <span class="material-icons">check_box</span>
+    Selecionadas
+    <span class="count-badge">{{ selectedIds.size }}</span>
+  </p>
+
+  @if (selectedIds.size > 0) {
+    <div class="chips-grid">
+      @for (id of selectedIdsArray; track id) {
+        <div class="q-chip">
+          <span class="chip-id" (click)="openPreview(id, $event)">{{ id | slice:0:8 }}…</span>
+          <button class="chip-remove" (click)="removeById(id)">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="empty-selected">
+      Nenhuma questão selecionada ainda. Pesquise acima.
+    </div>
+  }
+</div>
+
+@if (previewId) {
+  <app-question-preview [questionId]="previewId" (close)="previewId = null" />
+}

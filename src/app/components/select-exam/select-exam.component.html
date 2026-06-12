@@ -1,0 +1,151 @@
+<div class="select-exam-container">
+
+    <header class="page-header">
+        <div class="header-icon">
+            <span class="material-icons">event_note</span>
+        </div>
+        <div>
+            <p class="page-label">Banco de Provas</p>
+            <h1 class="page-title">Provas Oficiais do ENEM</h1>
+            <p class="page-subtitle">
+                Selecione o tipo, ano e dia da prova para iniciar uma sessão de estudo com questões reais do ENEM.
+            </p>
+        </div>
+    </header>
+
+    <section class="filters-panel">
+
+        <div class="filter-group">
+            <p class="filter-label">Tipo de Prova</p>
+            <div class="type-cards">
+                @for (t of examTypes; track t.value) {
+                <button class="type-card" [class.active]="selectedType() === t.value"
+                    (click)="selectedType.set(t.value)">
+                    <span class="type-icon material-icons">
+                        {{ t.value === 'REGULAR' ? 'school' : 'assignment_ind' }}
+                    </span>
+                    <div>
+                        <p class="type-title">{{ t.label }}</p>
+                        <p class="type-desc">{{ t.desc }}</p>
+                    </div>
+                </button>
+                }
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <p class="filter-label">Ano de Aplicação</p>
+            <div class="years-grid">
+                @for (year of years; track year) {
+                <button class="year-btn" [class.active]="selectedYear() === year" (click)="selectedYear.set(year)">{{
+                    year }}</button>
+                }
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <p class="filter-label">Dia da Prova</p>
+            <div class="day-cards">
+                @for (d of days; track d.value) {
+                <button class="day-card" [class.active]="selectedDay() === d.value" (click)="selectedDay.set(d.value)">
+                    <p class="day-title">{{ d.label }}</p>
+                    <p class="day-desc">{{ d.desc }}</p>
+                </button>
+                }
+            </div>
+        </div>
+
+        <div class="filter-actions">
+            <button class="btn-reset" (click)="resetFilters()" [disabled]="isLoading()">
+                <span class="material-icons">refresh</span>
+                <span>Limpar</span>
+            </button>
+            <button class="btn-search" (click)="search()" [disabled]="!canSearch() || isLoading()">
+                @if (isLoading()) {
+                <span class="material-icons spinner">sync</span>
+                <span>Buscando...</span>
+                } @else {
+                <span class="material-icons">search</span>
+                <span>Buscar Provas</span>
+                }
+            </button>
+        </div>
+
+    </section>
+
+    @if (hasSearched()) {
+    <section class="results-section">
+
+        <div class="results-header">
+            <h2>Resultados</h2>
+            <span class="results-count">{{ exams().length }} prova(s) encontrada(s)</span>
+        </div>
+
+        @if (errorMsg()) {
+        <div class="error-alert">
+            <span class="material-icons">error_outline</span>
+            <span>{{ errorMsg() }}</span>
+        </div>
+        }
+
+        @if (exams().length > 0) {
+        <div class="exams-list">
+            @for (exam of exams(); track exam.id) {
+            <div class="exam-card" 
+                [class.is-loading]="creatingSessionId() === exam.id"
+                [class.disabled]="creatingSessionId() && creatingSessionId() !== exam.id" 
+                (click)="selectExam(exam)"
+            >
+
+                <div class="exam-main">
+                    <div class="exam-icon-wrap">
+                        <span class="material-icons">description</span>
+                    </div>
+
+                    <div class="exam-info">
+                        <div class="exam-title-row">
+                            <h3>ENEM {{ exam.year }}</h3>
+                            <span class="badge badge-type" [class.ppl]="exam.type === 'PPL'">
+                                {{ exam.type }}
+                            </span>
+                            <span class="badge badge-day">{{ getDayLabel(exam.day) }}</span>
+                        </div>
+
+                        <div class="exam-areas">
+                            @for (area of getAreaBadges(exam); track area) {
+                            <span class="area-chip" [class]="'area-' + area">{{ area }}</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exam-right">
+                    <div class="exam-stat">
+                        <span class="stat-value">{{ exam._count.questions }}</span>
+                        <span class="stat-label">questões</span>
+                    </div>
+                    <div class="exam-cta">
+                        <span>Iniciar prova</span>
+                        <span class="material-icons">arrow_forward</span>
+                    </div>
+                </div>
+
+            </div>
+            }
+        </div>
+        }
+
+        @if (exams().length === 0 && !errorMsg()) {
+        <div class="empty-results">
+            <div class="empty-icon">
+                <span class="material-icons">search_off</span>
+            </div>
+            <p class="empty-title">Nenhuma prova encontrada</p>
+            <p class="empty-sub">Tente ajustar o tipo, ano ou dia nos filtros acima.</p>
+        </div>
+        }
+
+    </section>
+    }
+
+</div>

@@ -10,13 +10,14 @@
   box-sizing: border-box;
 }
 
+// ── Cabeçalho e Edição de Título ─────────────────────────────────────────
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   gap: $space-xl;
   margin-bottom: $space-xl;
-  padding-bottom: $space-xl;
+  padding-bottom: $space-lg;
   border-bottom: 1px solid $border-color;
 
   @include mobile {
@@ -27,11 +28,13 @@
 }
 
 .header-content {
+  flex: 1;
+
   .btn-back {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    background: transparent;
+    background: none;
     border: none;
     color: $text-muted;
     font-size: $font-size-sm;
@@ -41,129 +44,234 @@
     margin-bottom: $space-md;
     transition: $transition-fast;
 
-    .material-symbols-outlined { font-size: 18px; }
-    &:hover { color: $color-primary; }
-  }
-
-  .title-row {
-    display: flex;
-    align-items: center;
-    gap: $space-md;
-    margin-bottom: $space-xs;
-
-    h1 {
-      margin: 0;
-      font-size: $font-size-2xl;
-      font-weight: 800;
-      color: $text-heading;
+    &:hover {
+      color: $color-primary;
     }
-
-    .badge-primary {
-      @include badge($color-primary-dark, $color-primary-pale);
-      font-size: 13px;
-    }
-  }
-
-  .page-subtitle {
-    margin: 0;
-    font-size: $font-size-md;
-    color: $text-body;
-    max-width: 600px;
   }
 }
 
-.header-actions {
-  display: flex;
-  gap: $space-md;
+.title-row {
+  margin-bottom: $space-sm;
 
-  @include mobile {
-    width: 100%;
-    flex-direction: column;
+  .title-view-mode {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: $text-heading;
+      margin: 0;
+    }
+
+    .btn-edit-title {
+      background: $bg-subtle;
+      border: none;
+      color: $text-muted;
+      padding: 6px;
+      border-radius: $radius-sm;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: $color-primary-pale;
+        color: $color-primary;
+      }
+
+      .material-icons {
+        font-size: 18px;
+      }
+    }
+  }
+
+  .title-edit-mode {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .custom-input {
+      font-size: 20px;
+      font-weight: 700;
+      padding: 8px 12px;
+      border: 2px solid $color-primary;
+      border-radius: $radius-sm;
+      color: $text-heading;
+      flex: 1;
+      max-width: 400px;
+      outline: none;
+    }
+
+    .btn-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: $radius-sm;
+      cursor: pointer;
+      transition: 0.2s;
+      color: white;
+
+      &.save {
+        background: $color-primary;
+
+        &:hover {
+          background: $color-primary-dark;
+        }
+      }
+
+      &.cancel {
+        background: #94a3b8;
+
+        &:hover {
+          background: #64748b;
+        }
+      }
+    }
+  }
+}
+
+.page-subtitle {
+  font-size: $font-size-md;
+  color: $text-muted;
+  margin: 0;
+  line-height: 1.5;
+  max-width: 600px;
+}
+
+.header-actions {
+  .btn-secondary {
+    @include btn-primary;
+    background: white;
+    color: $text-heading;
+    border: 1px solid $border-color;
+    box-shadow: none;
+
+    &:hover {
+      background: $bg-subtle;
+    }
+  }
+}
+
+// ── Barra de Ações (Bulk Action) ──────────────────────────────────────────
+.bulk-action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: $bg-card;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  padding: 12px 20px;
+  margin-bottom: $space-md;
+  transition: 0.3s ease;
+
+  &.has-selection {
+    background: $color-primary-pale;
+    border-color: rgba($color-primary, 0.3);
+
+    .selected-text b {
+      color: $color-primary;
+    }
+  }
+
+  .selection-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .selected-text {
+    font-size: 14px;
+    color: $text-muted;
   }
 
   .btn-primary {
     @include btn-primary;
-  }
+    padding: 8px 16px;
+    border-radius: $radius-full;
 
-  .btn-secondary {
-    @include btn-primary;
-    background: $bg-card;
-    color: $color-primary;
-    border: 1px solid $border-color;
-    box-shadow: $shadow-xs;
-    
-    &:hover {
-      background: $color-primary-pale;
-      border-color: $color-primary-light;
-      box-shadow: none;
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
   }
 }
 
-.questions-section {
-  .section-title-bar {
-    margin-bottom: $space-lg;
-    h2 {
-      font-size: $font-size-lg;
-      color: $text-heading;
-      margin: 0;
-    }
-  }
-
-  .questions-list {
-    display: flex;
-    flex-direction: column;
-    gap: $space-sm;
-  }
-}
-
-.question-card {
-  @include card-base;
-  padding: $space-md $space-lg;
+// ── Lista de Questões ─────────────────────────────────────────────────────
+.q-list {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.q-card-row {
+  @include card-base;
+  display: flex;
   align-items: center;
-  border: 1px solid transparent; 
-  border-bottom: 1px solid $border-color;
-  border-radius: 0;
-  box-shadow: none;
-  background: transparent;
+  gap: $space-lg;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: 0.2s;
 
-  &:last-child { border-bottom: none; }
-  &:hover { background: $bg-card; box-shadow: $shadow-sm; border-radius: $radius-md; }
+  &:hover {
+    border-color: $color-primary-light;
+    transform: translateX(2px);
+  }
 
-  .q-info {
+  &.selected {
+    background: #f8fafc;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 1px $color-primary inset;
+  }
+
+  .checkbox-col {
     display: flex;
     align-items: center;
-    gap: $space-xl;
+    gap: 12px;
 
-    .q-number {
-      font-size: $font-size-xl;
-      font-weight: 800;
-      color: #cbd5e1; 
-      min-width: 40px;
-    }
-
-    .q-details {
-      h4 {
-        margin: 0 0 8px 0;
-        font-size: $font-size-md;
-        color: $text-heading;
-      }
-
-      .q-badges {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-
-        .badge-area { @include badge($badge-area-color, $badge-area-bg); }
-        .badge-skill { @include badge($badge-skill-color, $badge-skill-bg); }
-        .badge-year { @include badge($badge-year-color, $badge-year-bg); }
-      }
+    .q-order {
+      font-weight: 700;
+      color: $text-placeholder;
+      font-size: 14px;
+      width: 20px;
     }
   }
 
-  .q-actions {
+  .q-main-col {
+    flex: 1;
+
+    .q-badges {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 6px;
+
+      .badge {
+        @include badge($text-muted, $bg-subtle);
+        border: 1px solid $border-color;
+        font-size: 11px;
+      }
+
+      .badge-area {
+        background: $area-mt-bg;
+        color: $area-mt-color;
+        border-color: rgba($area-mt-color, 0.2);
+      }
+    }
+
+    .q-snippet {
+      margin: 0;
+      font-size: 14px;
+      color: $text-body;
+      line-height: 1.5;
+    }
+  }
+
+  .q-actions-col {
     display: flex;
     gap: 8px;
 
@@ -173,49 +281,137 @@
       color: $text-muted;
       cursor: pointer;
       padding: 8px;
-      border-radius: $radius-sm;
-      transition: $transition-fast;
+      border-radius: $radius-full;
+      transition: 0.2s;
 
-      .material-symbols-outlined { font-size: 20px; }
+      &.view:hover {
+        color: $color-primary;
+        background: $color-primary-pale;
+      }
 
-      &.view:hover { color: $color-primary; background: $color-primary-pale; }
-      &.delete:hover { color: $color-danger; background: $color-danger-pale; }
+      &.delete:hover {
+        color: #ef4444;
+        background: #fef2f2;
+      }
     }
   }
 }
 
+// ── Custom Checkbox Moderno ───────────────────────────────────────────────
+.custom-checkbox {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: white;
+    border: 2px solid #cbd5e1;
+    border-radius: 4px;
+    transition: 0.2s;
+  }
+
+  &:hover input~.checkmark {
+    border-color: $color-primary;
+  }
+
+  input:checked~.checkmark {
+    background-color: $color-primary;
+    border-color: $color-primary;
+  }
+
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  input:checked~.checkmark:after {
+    display: block;
+  }
+}
+
+// ── Estado Vazio e Loading ────────────────────────────────────────────────
 .empty-state {
   text-align: center;
-  padding: 80px 20px;
+  padding: 60px 20px;
   background: $bg-card;
   border: 1.5px dashed $border-color;
   border-radius: $radius-lg;
 
   .empty-icon-wrap {
-    display: inline-flex;
-    padding: 16px;
     background: $bg-subtle;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 16px;
 
-    .material-symbols-outlined { font-size: 32px; color: $text-placeholder; }
+    .material-icons {
+      font-size: 32px;
+      color: $text-placeholder;
+    }
   }
 
-  h3 { margin: 0 0 8px; color: $text-heading; }
-  p { margin: 0 0 24px; color: $text-muted; }
-  
+  h3 {
+    margin: 0 0 8px;
+    color: $text-heading;
+  }
+
+  p {
+    margin: 0 0 24px;
+    color: $text-muted;
+  }
+
   .btn-secondary {
     @include btn-primary;
-    background: white; color: $text-body; border: 1px solid $border-color; box-shadow: none;
-    &:hover { background: $bg-subtle; color: $text-heading; }
+    background: white;
+    color: $text-heading;
+    border: 1px solid $border-color;
+    box-shadow: none;
   }
 }
 
 .loading-state {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 120px 20px; color: $text-muted;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+  color: $color-primary;
 
-  .spinner { font-size: 40px; color: $color-primary; animation: spin 1s linear infinite; margin-bottom: 16px; }
+  .spinner {
+    font-size: 40px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+  }
 }
 
-@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}

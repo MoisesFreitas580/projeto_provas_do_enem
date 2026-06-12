@@ -1,0 +1,86 @@
+<div class="generate-container">
+  <header class="page-header">
+    <div class="header-icon">
+      <span class="material-icons">add_task</span>
+    </div>
+    <div>
+      <p class="page-label">Novo Simulado</p>
+      <h1 class="page-title">Configurar Simulado</h1>
+      <p class="page-subtitle">Configure as opções abaixo para gerar uma sessão de estudos sob medida.</p>
+    </div>
+  </header>
+
+  <div class="main-panel">
+
+    <div class="step-block">
+      <div class="step-label">
+        <span class="step-number">1</span>
+        <span>Dê um nome ao simulado</span>
+        <span class="step-optional">(opcional)</span>
+      </div>
+      <input
+        type="text"
+        class="title-input"
+        [ngModel]="title()"
+        (ngModelChange)="title.set($event)"
+        placeholder="Ex: Treino intensivo de Matemática 2023"
+      />
+    </div>
+
+    <div class="step-block">
+      <div class="step-label">
+        <span class="step-number">2</span>
+        <span>Escolha a estratégia</span>
+      </div>
+      <div class="strategy-cards">
+        @for (s of strategies; track s.value) {
+          <button
+            class="strategy-card"
+            [class.active]="strategy() === s.value"
+            (click)="strategy.set(s.value)"
+          >
+            <div class="s-icon-wrap">
+              <span class="material-icons">{{ s.icon }}</span>
+            </div>
+            <div class="s-text">
+              <p class="s-title">{{ s.label }}</p>
+              <p class="s-desc">{{ s.desc }}</p>
+            </div>
+            <span class="s-check material-icons">check_circle</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="step-block">
+      <div class="step-label">
+        <span class="step-number">3</span>
+        <span>Configure os detalhes</span>
+      </div>
+      <div class="strategy-form-area">
+        @if (strategy() === 'exact_exam') {
+          <app-exact-exam-form (payloadChange)="updateChildPayload($event)" />
+        }
+        @if (strategy() === 'manual') {
+          <app-manual-exam-form (payloadChange)="updateChildPayload($event)" />
+        }
+        @if (strategy() === 'random') {
+          <app-random-exam-form (payloadChange)="updateChildPayload($event)" />
+        }
+      </div>
+    </div>
+
+    <div class="submit-row">
+      <button class="generate-btn" (click)="createSimulation()" [disabled]="isLoading()">
+        @if (isLoading()) {
+          <span class="material-icons spinning">sync</span>
+          <span>A processar...</span>
+        } @else {
+          <span class="material-icons">rocket_launch</span>
+          <span>Gerar e Iniciar Simulado</span>
+        }
+      </button>
+    </div>
+
+  </div>
+</div>

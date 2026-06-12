@@ -1,106 +1,135 @@
 <div class="details-container">
 
   @if (isLoading) {
-    <div class="loading-state">
-      <span class="material-symbols-outlined spinner">sync</span>
-      <p>A carregar detalhes do simulado...</p>
-    </div>
+  <div class="loading-state">
+    <span class="material-icons spinner">sync</span>
+    <p>A carregar detalhes do simulado...</p>
+  </div>
   } @else {
 
-    <header class="page-header">
-      <div class="header-content">
-        <button class="btn-back" routerLink="/">
-          <span class="material-symbols-outlined">arrow_back</span> Voltar ao Dashboard
-        </button>
-        
-        <div class="title-row">
-          <h1 class="page-title">{{ simulationDetails?.title || 'Simulado Personalizado' }}</h1>
-          <span class="badge badge-primary">{{ questions.length }} questões</span>
+  <header class="page-header">
+    <div class="header-content">
+      <button class="btn-back" routerLink="/dashboard">
+        <span class="material-icons">arrow_back</span> Voltar
+      </button>
+
+      <div class="title-row">
+        @if (isEditingTitle) {
+        <div class="title-edit-mode">
+          <input type="text" class="custom-input" [(ngModel)]="editTitleValue" (keyup.enter)="saveTitle()" autoFocus>
+          <button class="btn-icon save" (click)="saveTitle()" title="Salvar"><span
+              class="material-icons">check</span></button>
+          <button class="btn-icon cancel" (click)="isEditingTitle = false" title="Cancelar"><span
+              class="material-icons">close</span></button>
         </div>
-        
-        <p class="page-subtitle">
-          Faça a gestão do seu simulado. Adicione novas questões, remova ou previsualize o conteúdo antes de iniciar a sua sessão de estudo.
-        </p>
-      </div>
-
-      <div class="header-actions">
-        <button class="btn-secondary" (click)="openAddQuestionsSearch()">
-          <span class="material-symbols-outlined">search</span> Adicionar Questões
-        </button>
-        
-        <button class="btn-primary" [routerLink]="['/simulations', simulationId, 'practice']" [disabled]="questions.length === 0">
-          <span class="material-symbols-outlined">play_arrow</span> Praticar Simulado
-        </button>
-      </div>
-    </header>
-
-    <section class="questions-section">
-      <div class="section-title-bar">
-        <h2>Conteúdo do Simulado</h2>
-      </div>
-
-      <div class="questions-list">
-        @for (item of questions; track item.id || item.question?.id; let i = $index) {
-          
-          <div class="question-card">
-            <div class="q-info">
-              
-              <div class="q-details">
-                <h4>Questão {{ item.question?.number }}</h4>
-                <div class="q-badges">
-                  <span class="badge-area">{{ item.question?.area || 'Geral' }}</span>
-                  
-                  @if (item.question?.skillCode) {
-                    <span class="badge-skill">Habilidade {{ item.question.skillCode }}</span>
-                  }
-                  @if (item.question?.exam?.year) {
-                    <span class="badge-year">ENEM {{ item.question.exam.year }}</span>
-                  }
-                </div>
-              </div>
-            </div>
-            
-            <div class="q-actions">
-              <button class="btn-icon view" (click)="openQuestionPreview(item)" title="Previsualizar Questão">
-                <span class="material-symbols-outlined">visibility</span>
-              </button>
-              <button class="btn-icon delete" (click)="removeQuestion(item.question?.id || item.id)" title="Remover do Simulado">
-                <span class="material-symbols-outlined">delete</span>
-              </button>
-            </div>
-          </div>
-
-        } @empty {
-          
-          <div class="empty-state">
-            <div class="empty-icon-wrap">
-              <span class="material-symbols-outlined">assignment_late</span>
-            </div>
-            <h3>O seu simulado está vazio</h3>
-            <p>Este simulado ainda não possui nenhuma questão atrelada a ele.</p>
-            <button class="btn-secondary" (click)="openAddQuestionsSearch()">
-              Buscar e adicionar questões
-            </button>
-          </div>
-
+        } @else {
+        <div class="title-view-mode">
+          <h1 class="page-title">{{ simulationDetails?.title || 'Simulado Sem Título' }}</h1>
+          <button class="btn-edit-title" (click)="startEditingTitle()" title="Editar Título">
+            <span class="material-icons">edit</span>
+          </button>
+        </div>
         }
       </div>
-    </section>
+
+      <p class="page-subtitle">Faça a gestão das questões deste simulado. Pode selecionar questões específicas para
+        iniciar um treino focado.</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="openAddQuestionsSearch()">
+        <span class="material-icons">search</span> Adicionar Questões
+      </button>
+    </div>
+  </header>
+
+  <div class="bulk-action-bar" [class.has-selection]="selectedQuestions.size > 0">
+    <div class="selection-info">
+      <label class="custom-checkbox">
+        <input type="checkbox" [checked]="isAllSelected()" (change)="toggleAll()">
+        <span class="checkmark"></span>
+      </label>
+      <span class="selected-text">
+        @if (selectedQuestions.size > 0) {
+        <b>{{ selectedQuestions.size }}</b> selecionadas de {{ questions.length }}
+        } @else {
+        Selecionar tudo
+        }
+      </span>
+    </div>
+
+    <div class="action-buttons">
+      <button class="btn-primary" [disabled]="selectedQuestions.size === 0 || isStartingSession"
+        (click)="startSelectedPractice()">
+        @if (isStartingSession) {
+        <span class="material-icons spinner">sync</span> Iniciando...
+        } @else {
+        <span class="material-icons">play_arrow</span> Praticar Selecionadas
+        }
+      </button>
+    </div>
+  </div>
+
+  <section class="questions-list-section">
+    <div class="q-list">
+      @for (item of questions; track item.id; let i = $index) {
+
+      <label class="q-card-row" [class.selected]="selectedQuestions.has(item.question?.id || item.id)">
+
+        <div class="checkbox-col">
+          <div class="custom-checkbox">
+            <input type="checkbox" [checked]="selectedQuestions.has(item.question?.id || item.id)"
+              (change)="toggleSelection(item.question?.id || item.id)">
+            <span class="checkmark"></span>
+          </div>
+          <span class="q-order">{{ i + 1 }}</span>
+        </div>
+
+        <div class="q-main-col">
+          <div class="q-badges">
+            <span class="badge badge-area">{{ item.question?.area || 'Geral' }}</span>
+            @if (item.question?.exam?.year) { <span class="badge badge-subtle">ENEM {{ item.question.exam.year }}</span>
+            }
+          </div>
+          <p class="q-snippet">
+            {{ (item.question?.rawJson?.comando | slice:0:180) || 'Sem enunciado...' }}...
+          </p>
+        </div>
+
+        <div class="q-actions-col">
+          <button class="btn-icon view" (click)="openQuestionPreview(item, $event)" title="Visualizar">
+            <span class="material-icons">visibility</span>
+          </button>
+          <button class="btn-icon delete" (click)="removeQuestion(item.question?.id || item.id, $event)"
+            title="Remover">
+            <span class="material-icons">delete</span>
+          </button>
+        </div>
+
+      </label>
+
+      } @empty {
+
+      <div class="empty-state">
+        <div class="empty-icon-wrap"><span class="material-icons">assignment_late</span></div>
+        <h3>Simulado Vazio</h3>
+        <p>Este simulado ainda não possui questões. Adicione novas questões para começar a praticar.</p>
+        <button class="btn-secondary" (click)="openAddQuestionsSearch()">Procurar Questões</button>
+      </div>
+
+      }
+    </div>
+  </section>
 
   }
 
 </div>
 
 @if (isPreviewModalOpen) {
-  <app-question-preview 
-    [questionId]="previewQuestionId" 
-    (close)="closePreviewModal()">
-  </app-question-preview>
+<app-question-preview [questionId]="previewQuestionId" (close)="closePreviewModal()"></app-question-preview>
 }
 
 @if (isSearchModalOpen) {
-  <app-question-search-modal 
-    (close)="closeSearchModal()" 
-    (addSelected)="addSelectedQuestions($event)">
-  </app-question-search-modal>
+<app-question-search-modal (close)="closeSearchModal()"
+  (addSelected)="addSelectedQuestions($event)"></app-question-search-modal>
 }

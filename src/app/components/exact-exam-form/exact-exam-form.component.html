@@ -1,0 +1,57 @@
+<div class="form-section">
+  <p class="form-section-label">
+    <span class="material-icons">assignment</span>
+    Aplicação da Prova
+  </p>
+  <div class="option-cards">
+    <button class="option-card" [class.active]="type === 'REGULAR'" (click)="setType('REGULAR')">
+      <span class="material-icons">school</span>
+      <div>
+        <p class="opt-title">Regular</p>
+        <p class="opt-desc">Prova aplicada em todo o Brasil</p>
+      </div>
+    </button>
+    <button class="option-card" [class.active]="type === 'PPL'" (click)="setType('PPL')">
+      <span class="material-icons">assignment_ind</span>
+      <div>
+        <p class="opt-title">PPL</p>
+        <p class="opt-desc">Reaplicação — Privados de Liberdade</p>
+      </div>
+    </button>
+  </div>
+</div>
+
+<div class="form-section">
+  <p class="form-section-label">
+    <span class="material-icons">calendar_today</span>
+    Ano de Aplicação
+  </p>
+  <div class="years-grid">
+    @for (y of years; track y) {
+      <button class="year-btn" [class.active]="year === y" (click)="setYear(y)">{{ y }}</button>
+    }
+  </div>
+</div>
+
+<div class="form-section">
+  <p class="form-section-label">
+    <span class="material-icons">today</span>
+    Dia de Aplicação
+  </p>
+  <div class="option-cards">
+    <button class="option-card" [class.active]="day === 'D1'" (click)="setDay('D1')">
+      <span class="material-icons">history_edu</span>
+      <div>
+        <p class="opt-title">Dia 1</p>
+        <p class="opt-desc">Linguagens e Ciências Humanas</p>
+      </div>
+    </button>
+    <button class="option-card" [class.active]="day === 'D2'" (click)="setDay('D2')">
+      <span class="material-icons">calculate</span>
+      <div>
+        <p class="opt-title">Dia 2</p>
+        <p class="opt-desc">Ciências da Natureza e Matemática</p>
+      </div>
+    </button>
+  </div>
+</div>

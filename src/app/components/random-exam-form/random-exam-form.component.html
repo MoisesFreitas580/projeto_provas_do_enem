@@ -1,0 +1,71 @@
+<div class="form-section">
+  <p class="form-section-label">
+    <span class="material-icons">format_list_numbered</span>
+    Número de Questões
+  </p>
+  <div class="quantity-row">
+    @for (q of [5, 10, 15, 20, 30, 45, 90]; track q) {
+      <button class="qty-btn" [class.active]="quantity === q" (click)="quantity = q; emit()">{{ q }}</button>
+    }
+    <div class="qty-custom">
+      <input
+        type="number"
+        [(ngModel)]="quantity"
+        (ngModelChange)="emit()"
+        min="1"
+        max="180"
+        placeholder="Outro"
+      />
+    </div>
+  </div>
+</div>
+
+<div class="form-section">
+  <p class="form-section-label">
+    <span class="material-icons">filter_alt</span>
+    Filtros Pedagógicos
+    <span class="label-optional">(todos opcionais)</span>
+  </p>
+  <div class="form-grid">
+
+    <div class="form-group">
+      <label>Área de Conhecimento</label>
+      <select [(ngModel)]="selectedArea" (change)="onAreaChange()">
+        <option value="">Todas as Áreas</option>
+        @for (area of areas; track area.id) {
+          <option [value]="area.code">{{ area.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Competência</label>
+      <select [(ngModel)]="selectedCompetency" (change)="onCompetencyChange()" [disabled]="!selectedArea">
+        <option value="">Todas</option>
+        @for (comp of competencies; track comp.id) {
+          <option [value]="comp.code">{{ comp.code }} — {{ comp.description | slice:0:40 }}...</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Habilidade</label>
+      <select [(ngModel)]="selectedSkill" (change)="emit()" [disabled]="!selectedCompetency">
+        <option value="">Todas</option>
+        @for (skill of skills; track skill.id) {
+          <option [value]="skill.code">{{ skill.code }}</option>
+        }
+      </select>
+    </div>
+
+  </div>
+
+  @if (selectedArea || selectedCompetency || selectedSkill) {
+    <div class="active-filters">
+      <span class="af-label">Filtrando por:</span>
+      @if (selectedArea)       { <span class="af-chip">{{ selectedArea }}</span> }
+      @if (selectedCompetency) { <span class="af-chip">{{ selectedCompetency }}</span> }
+      @if (selectedSkill)      { <span class="af-chip">{{ selectedSkill }}</span> }
+    </div>
+  }
+</div>

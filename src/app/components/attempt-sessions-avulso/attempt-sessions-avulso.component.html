@@ -1,0 +1,112 @@
+<div class="session-container">
+  
+  @if (isLoading) {
+    <div class="loading-overlay">
+      <span class="material-icons spinner">sync</span>
+      <p>A preparar a sua sessão de treino...</p>
+    </div>
+  } @else {
+
+    <header class="session-header">
+      <div class="header-left">
+        <h2>{{ sessionTitle }}</h2>
+        <span class="progress-text">Questão {{ currentQuestionIndex + 1 }} de {{ questions.length }}</span>
+      </div>
+      <div class="header-right">
+        <button class="btn-danger-outline" (click)="abandonSession()" [disabled]="isSubmitting">
+          Abandonar
+        </button>
+        <button class="btn-primary" (click)="finishSession()" [disabled]="isSubmitting">
+          @if (isSubmitting) {
+            <span class="material-icons spinner">sync</span> Processando...
+          } @else {
+            <span class="material-icons">done_all</span> Finalizar Treino
+          }
+        </button>
+      </div>
+    </header>
+
+    <div class="session-body">
+      
+      <aside class="sidebar-nav">
+        <h3>Navegação</h3>
+        <div class="grid-questions">
+          @for (q of questions; track q.id; let i = $index) {
+            <button 
+              class="q-pill"
+              [ngClass]="getQuestionStatusClass(q.id)"
+              [class.active]="i === currentQuestionIndex"
+              (click)="goToQuestion(i)"
+            >
+              {{ i + 1 }}
+            </button>
+          }
+        </div>
+        
+        <div class="legend">
+          <div class="legend-item"><span class="dot unseen"></span> Não vista</div>
+          <div class="legend-item"><span class="dot seen"></span> Vista (Pendente)</div>
+          <div class="legend-item"><span class="dot answered"></span> Respondida</div>
+        </div>
+      </aside>
+
+      <main class="question-area">
+        @if (currentQuestion) {
+          
+          <div class="question-card">
+            <div class="q-header">
+              <span class="badge-area">{{ currentQuestion.area || 'Geral' }}</span>
+              <span class="q-number">Questão {{ currentQuestionIndex + 1 }}</span>
+            </div>
+
+            <div class="q-content">
+              @for (block of currentQuestion.blocks; track block.id) {
+                @if (block.type === 'TEXT' && block.text !== currentQuestion.rawJson?.comando) {
+                  <div class="support-text" [innerHTML]="block.text"></div>
+                } 
+                @else if (block.type === 'IMAGE') {
+                  <div class="image-wrapper" style="text-align: center; margin: 16px 0;">
+                    <img class="support-image" 
+                         [src]="block.imageUrl || 'https://placehold.co/600x300?text=Imagem+Ausente'" 
+                         onerror="this.src='https://placehold.co/600x300?text=Erro+ao+carregar+imagem'"
+                         alt="Ilustração da questão"
+                         style="max-width: 100%; border-radius: 6px;">
+                  </div>
+                }
+              }
+            </div>
+
+            @if (currentQuestion.rawJson?.comando) {
+              <div class="q-statement" style="background: #f8fafc; padding: 16px; border-left: 4px solid #0f766e; border-radius: 0 8px 8px 0; margin-bottom: 24px;">
+                <p style="margin: 0; font-size: 16px; color: #1e293b;"><strong>{{ currentQuestion.rawJson.comando }}</strong></p>
+              </div>
+            }
+
+            <div class="alternatives-list">
+              @for (alt of currentQuestion.alternatives; track alt.id) {
+                <button 
+                  class="alt-btn"
+                  [class.selected]="answersCache[currentQuestionId]?.selectedAlternativeId === alt.id"
+                  (click)="selectAlternative(alt.id)"
+                >
+                  <span class="alt-letter">{{ alt.letter }}</span>
+                  <span class="alt-text" [innerHTML]="alt.text"></span>
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="nav-controls">
+            <button class="btn-secondary" (click)="goToQuestion(currentQuestionIndex - 1)" [disabled]="currentQuestionIndex === 0">
+              <span class="material-icons">arrow_back</span> Anterior
+            </button>
+            <button class="btn-primary" (click)="goToQuestion(currentQuestionIndex + 1)" [disabled]="currentQuestionIndex === questions.length - 1">
+              Próxima <span class="material-icons">arrow_forward</span>
+            </button>
+          </div>
+
+        }
+      </main>
+    </div>
+  }
+</div>

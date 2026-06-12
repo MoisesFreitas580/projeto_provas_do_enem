@@ -3,7 +3,8 @@
     <div class="hero-body">
       <img src="app/assets/logo-branca.png" alt="Logo IFCE" class="app-logo-mini">
       <h1>Estude para o ENEM por Competências</h1>
-      <p>Treine com um banco de questões atualizado, simulados interativos e relatórios de desempenho completos criados para o seu sucesso.</p>
+      <p>Treine com um banco de questões atualizado, simulados interativos e relatórios de desempenho completos criados
+        para o seu sucesso.</p>
     </div>
   </section>
 
@@ -15,32 +16,61 @@
 
     <div class="cards-grid">
       @for (area of knowledgeAreas$ | async; track area.id) {
-        <div class="area-card" [class]="'area-' + area.code" [routerLink]="['/area', area.id]">
-          <div class="card-header-row">
-            <div class="icon-box">
-              <span class="material-icons">{{ area.icon }}</span>
-            </div>
-            <span class="area-tag">{{ area.code }}</span>
+      <div class="area-card" [class]="'area-' + area.code" [routerLink]="['/area', area.id]">
+        <div class="card-header-row">
+          <div class="icon-box">
+            <span class="material-icons">{{ area.icon }}</span>
           </div>
-          
-          <div class="card-body">
-            <h3>{{ area.name }}</h3>
-          </div>
+          <span class="area-tag">{{ area.code }}</span>
+        </div>
 
-          <div class="card-footer">
-            <span class="action-text">Aceder à área</span>
-            <span class="material-icons arrow">chevron_right</span>
-          </div>
+        <div class="card-body">
+          <h3>{{ area.name }}</h3>
         </div>
+
+        <div class="card-footer">
+          <span class="action-text">Aceder à área</span>
+          <span class="material-icons arrow">chevron_right</span>
+        </div>
+      </div>
       } @empty {
-        <div class="empty-state">
-          <span class="material-icons spinning">sync</span>
-          <p>A carregar os seus conteúdos de estudo...</p>
-        </div>
+      <div class="empty-state">
+        <span class="material-icons spinning">sync</span>
+        <p>A carregar os seus conteúdos de estudo...</p>
+      </div>
       }
     </div>
   </section>
+  <section class="quick-access-section">
+    <div class="section-title-bar">
+      <h2>Prática e Simulados</h2>
+      <span class="subtitle">Treine com provas reais ou crie o seu próprio simulado</span>
+    </div>
 
+    <div class="quick-access-grid">
+      <a class="quick-access-card" routerLink="/exams">
+        <div class="qa-icon">
+          <span class="material-icons">event_note</span>
+        </div>
+        <div class="qa-text">
+          <h3>Banco de Provas</h3>
+          <p>Acesse provas REGULAR e PPL de todos os anos</p>
+        </div>
+        <span class="material-icons qa-arrow">arrow_forward</span>
+      </a>
+
+      <a class="quick-access-card custom-bg" routerLink="/generate-simulation">
+        <div class="qa-icon">
+          <span class="material-icons">psychology</span>
+        </div>
+        <div class="qa-text">
+          <h3>Simulados Personalizados</h3>
+          <p>Crie simulados exatos, aleatórios ou manuais</p>
+        </div>
+        <span class="material-icons qa-arrow">arrow_forward</span>
+      </a>
+    </div>
+  </section>
   <section class="simulations-layout">
     <app-user-simulations></app-user-simulations>
   </section>

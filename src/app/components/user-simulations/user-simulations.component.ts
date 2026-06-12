@@ -2,9 +2,8 @@ import { Component, OnInit, inject } from '@angular/core';
 import { AsyncPipe, NgIf } from '@angular/common';
 import { Observable, map } from 'rxjs';
 import { SimulationsService } from '@services/simulations/simulations.service';
-import { AuthService } from '@helpers/auth.service';
-import { RouterLink } from '@angular/router';
-import { CreateSimulationModalComponent } from '@components/create-simulation-modal/create-simulation-modal.component';
+import { Router, RouterLink } from '@angular/router';
+import { AttemptSessionsService } from '@services/attempt-sessions/attempt-sessions.service';
 
 export interface SimulationFilters {
   area?: string;
@@ -30,11 +29,10 @@ interface ApiSimulationItem {
   filters: SimulationFilters | null;
   _count?: {
     simulationQuestions?: number;
-    attemptSessions?: number;   // ← nome atualizado conforme novo JSON
+    attemptSessions?: number;
   };
 }
 
-// Novo formato de resposta: { data: [...], meta: {...} }
 interface ApiResponse {
   data: ApiSimulationItem[];
   meta?: {
@@ -49,53 +47,63 @@ interface ApiResponse {
   selector: 'app-user-simulations',
   templateUrl: './user-simulations.component.html',
   styleUrls: ['./user-simulations.component.scss'],
-  imports: [RouterLink, AsyncPipe, CreateSimulationModalComponent],
+  imports: [RouterLink, AsyncPipe],
   standalone: true,
 })
 export class UserSimulationsComponent implements OnInit {
   private simulationsService = inject(SimulationsService);
-  private authService = inject(AuthService);
+  private router = inject(Router);
+  private attemptSessionsService = inject(AttemptSessionsService);
 
-  protected readonly Object = Object;
-
+  public startingSessionId: string | null = null;
   public userSimulations$!: Observable<SimulationItem[]>;
-  public isModalOpen = false;
 
   ngOnInit(): void {
     this.fetchUserSimulations();
-  }
-
-  public openModal(): void { this.isModalOpen = true; }
-  public closeModal(wasCreated: boolean = false): void {
-    this.isModalOpen = false;
-    if (wasCreated) {
-      this.fetchUserSimulations();
-    }
   }
 
   public getDisplayTitle(sim: SimulationItem): string {
     return sim.title?.trim() || 'Simulação sem título';
   }
 
-  public filterCount(filters: SimulationFilters | null): number {
-    if (!filters) return 0;
-    return Object.values(filters).filter(v => v !== undefined && v !== null).length;
+
+
+  public startSimulation(sim: SimulationItem): void {
+
+    if (this.startingSessionId) return; 
+    this.startingSessionId = sim.id;
+
+    const payload = {
+      simulationId: sim.id,
+      title: sim.title || 'Simulado Personalizado'
+    };
+    this.attemptSessionsService.createSimulationSession(payload).subscribe({
+      next: (sessionResponse) => {
+        this.startingSessionId = null;
+        this.router.navigate(['/attempt-sessions-simulation', sessionResponse.id]);
+      },
+      error: (err) => {
+        console.error('Erro ao iniciar simulado:', err);
+        alert('Erro ao preparar o seu simulado. Tente novamente.');
+        this.startingSessionId = null;
+      }
+    });
   }
 
-
-
-  public editSimulation(sim: any, event: Event): void {
+public editSimulation(sim: any, event: Event): void {
     event.stopPropagation();
-    alert(`Modo de edição da simulação "${sim.title}" em desenvolvimento.`);
+
+    this.router.navigate(['/simulations-details', sim.id]);
   }
 
   public deleteSimulation(id: string, event: Event): void {
     event.stopPropagation();
-    const confirm = window.confirm('Deseja apenas simular a remoção deste simulado no design?');
+    const confirm = window.confirm('Tem a certeza que deseja excluir este simulado permanentemente?');
     if (confirm) {
-      alert('Remoção visual ativada. Backend ainda não implementado.');
+      alert('Exclusão ativada (Preparado para atualização futura do backend).');
     }
   }
+
 
   private fetchUserSimulations(): void {
     this.userSimulations$ = this.simulationsService.getSimulations().pipe(
@@ -106,10 +114,12 @@ export class UserSimulationsComponent implements OnInit {
           id: item.id,
           title: item.title,
           filters: item.filters,
-          questionsCount: item._count?.simulationQuestions ?? 0,
-          attemptsCount: item._count?.attemptSessions ?? 0,   
+          questionsCount: item._count?.simulationQuestions || 0,
+          attemptsCount: item._count?.attemptSessions || 0
         }));
+  
       })
     );
+
   }
 }

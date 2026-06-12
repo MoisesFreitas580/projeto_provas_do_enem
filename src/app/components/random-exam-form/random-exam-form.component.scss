@@ -1,0 +1,92 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+@use '../exact-exam-form/exact-exam-form.component.scss' as *; // reutiliza .form-section, .form-grid, .form-group
+
+// ── Quantidade ────────────────────────────────────────────────────────────
+.quantity-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-sm;
+  align-items: center;
+}
+
+.qty-btn {
+  padding: 8px 16px;
+  border: 1.5px solid $border-color;
+  border-radius: $radius-md;
+  background: $bg-card;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  color: $text-body;
+  cursor: pointer;
+  min-width: 52px;
+  text-align: center;
+  transition: $transition-fast;
+
+  &:hover {
+    border-color: rgba($color-primary, 0.4);
+    color: $color-primary;
+    background: $color-primary-pale;
+  }
+
+  &.active {
+    background: $color-primary;
+    border-color: $color-primary;
+    color: #fff;
+    box-shadow: $shadow-primary;
+  }
+}
+
+.qty-custom {
+  input {
+    width: 80px;
+    padding: 8px 12px;
+    font-size: $font-size-sm;
+    border: 1.5px solid $border-color;
+    border-radius: $radius-md;
+    background: $bg-card;
+    color: $text-heading;
+    outline: none;
+    transition: $transition-fast;
+
+    &:focus {
+      border-color: $color-primary;
+      box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+    }
+
+    &::placeholder { color: $text-placeholder; }
+  }
+}
+
+// ── Rótulo com opcional ───────────────────────────────────────────────────
+.label-optional {
+  font-size: $font-size-xs;
+  font-weight: 400;
+  color: $text-muted;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: 4px;
+}
+
+// ── Filtros ativos ────────────────────────────────────────────────────────
+.active-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $space-sm;
+  padding: $space-sm $space-md;
+  background: $color-primary-pale;
+  border: 1px solid rgba($color-primary, 0.25);
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+
+  .af-label {
+    font-weight: 600;
+    color: $color-primary-dark;
+  }
+
+  .af-chip {
+    @include badge($color-primary, rgba($color-primary, 0.12));
+    font-size: $font-size-xs;
+  }
+}

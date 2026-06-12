@@ -36,8 +36,7 @@ export class SimulationsService {
   // POST /simulations/generate
   // O body suporta strategy (exact_exam, random, manual), type, year, quantity, filters, etc.
   public generateSimulation(body: any): Observable<any> {
-
-    console.log('Generating simulation with body:', body); // Log para depuração
+    
     return this.$http.post<any>(`${this.base_url}/generate`, body);
   }
 

@@ -1,0 +1,273 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.generate-container {
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: $space-xl $space-lg $space-xxl;
+  box-sizing: border-box;
+  min-height: calc(100vh - #{$header-height});
+  background: $bg-app;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-lg;
+  margin-bottom: $space-xl;
+}
+
+.header-icon {
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+  border-radius: $radius-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: $shadow-primary;
+  margin-top: 4px;
+
+  .material-icons {
+    font-size: 26px;
+    color: #fff;
+  }
+}
+
+.page-label {
+  font-size: $font-size-xs;
+  font-weight: 700;
+  color: $color-primary;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 $space-xs;
+}
+
+.page-title {
+  font-size: $font-size-2xl;
+  font-weight: 800;
+  color: $text-heading;
+  margin: 0 0 $space-sm;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-size: $font-size-md;
+  color: $text-muted;
+  margin: 0;
+  line-height: 1.6;
+  max-width: 560px;
+}
+
+.main-panel {
+  @include card-base;
+  padding: $space-xl;
+  display: flex;
+  flex-direction: column;
+  gap: 0; 
+}
+
+.step-block {
+  padding: $space-xl 0;
+  border-bottom: 1px solid $border-color;
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+}
+
+.step-label {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  margin-bottom: $space-lg;
+  font-size: $font-size-sm;
+  font-weight: 700;
+  color: $text-heading;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  .step-number {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    background: $color-primary;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $font-size-xs;
+    font-weight: 800;
+  }
+
+  .step-optional {
+    font-size: $font-size-xs;
+    font-weight: 400;
+    color: $text-muted;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+}
+
+.title-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: $font-size-md;
+  border: 1.5px solid $border-color;
+  border-radius: $radius-md;
+  background: $bg-card;
+  color: $text-heading;
+  outline: none;
+  transition: $transition-fast;
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+  }
+
+  &::placeholder {
+    color: $text-placeholder;
+  }
+}
+
+.strategy-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-md;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.strategy-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: $space-md;
+  padding: $space-md $space-lg;
+  border: 1.5px solid $border-color;
+  border-radius: $radius-lg;
+  background: $bg-card;
+  cursor: pointer;
+  text-align: left;
+  transition: $transition-smooth;
+
+  .s-icon-wrap {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: $radius-md;
+    background: $bg-subtle;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: $transition-fast;
+
+    .material-icons {
+      font-size: 22px;
+      color: $text-muted;
+      transition: color 0.2s;
+    }
+  }
+
+  .s-text {
+    flex: 1;
+    min-width: 0;
+
+    .s-title {
+      font-size: $font-size-md;
+      font-weight: 700;
+      color: $text-heading;
+      margin: 0 0 2px;
+    }
+
+    .s-desc {
+      font-size: $font-size-xs;
+      color: $text-muted;
+      margin: 0;
+      line-height: 1.4;
+    }
+  }
+
+  .s-check {
+    font-size: 18px;
+    color: transparent;
+    flex-shrink: 0;
+    transition: $transition-fast;
+  }
+
+  &:hover {
+    border-color: rgba($color-primary, 0.4);
+    background: $color-primary-pale;
+
+    .s-icon-wrap {
+      background: rgba($color-primary, 0.1);
+
+      .material-icons {
+        color: $color-primary;
+      }
+    }
+  }
+
+  &.active {
+    border-color: $color-primary;
+    background: $color-primary-pale;
+    box-shadow: 0 0 0 3px rgba($color-primary, 0.08);
+
+    .s-icon-wrap {
+      background: rgba($color-primary, 0.12);
+
+      .material-icons {
+        color: $color-primary;
+      }
+    }
+
+    .s-title {
+      color: $color-primary-dark;
+    }
+
+    .s-check {
+      color: $color-primary;
+    }
+  }
+}
+
+.strategy-form-area {
+  background: $bg-subtle;
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+  padding: $space-xl;
+}
+
+.submit-row {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: $space-xl;
+}
+
+.generate-btn {
+  @include btn-primary;
+  font-size: $font-size-md;
+  padding: 13px 32px;
+  gap: 8px;
+
+  .spinning {
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}

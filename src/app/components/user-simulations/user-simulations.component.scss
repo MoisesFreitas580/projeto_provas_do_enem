@@ -1,10 +1,11 @@
+@use 'sass:color';
 @use 'variables' as *;
 @use 'mixins' as *;
 
 .user-simulations-section {
   width: 100%;
   max-width: $max-width-content;
-  margin: $space-xl auto $space-xxl;
+  margin: 0 auto $space-xxl;
   padding: 0 $space-lg;
   box-sizing: border-box;
 }
@@ -18,171 +19,176 @@
 
   .title-block {
     .section-label {
-      font-size: $font-size-xs;
+      font-size: $font-size-sm;
       font-weight: 700;
-      color: $color-primary;
+      color: $text-muted;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      margin: 0 0 4px;
+      margin: 0;
     }
 
     h2 {
-      font-size: $font-size-xl;
-      font-weight: 800;
+      font-size: 22px;
+      font-weight: 700;
       color: $text-heading;
-      margin: 0;
-      letter-spacing: -0.02em;
+      margin: 4px 0 0 0;
     }
   }
+
 }
 
-.btn-create {
-  @include btn-primary;
-}
-
-.simulations-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: $space-lg;
-
-  @include tablet { grid-template-columns: repeat(2, 1fr); }
-  @include mobile { grid-template-columns: 1fr; }
-}
-
-.simulation-card {
-  @include card-base;
-  padding: $space-lg;
+.simulations-list {
   display: flex;
   flex-direction: column;
-  gap: $space-md;
-  cursor: pointer;
-  min-height: 220px;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: $shadow-lg;
-    border-color: rgba($color-primary, 0.3);
-
-    .card-cta {
-      color: $color-primary;
-      .cta-arrow { transform: translateX(5px); }
-    }
-  }
-}
-
-.card-top {
-  display: flex;
-  align-items: flex-start;
   gap: $space-sm;
 }
 
-.sim-icon-wrap {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  background: $color-primary-pale;
-  border-radius: $radius-md;
+.sim-list-item {
+  @include card-base;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  padding: 12px $space-lg;
+  gap: $space-lg;
+  transition: $transition-smooth;
 
-  .material-icons {
-    font-size: 18px;
-    color: $color-primary;
+  &:hover {
+    transform: translateX(4px);
+    border-color: $color-primary-light;
+    box-shadow: $shadow-sm;
+  }
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space-md;
   }
 }
 
-.sim-title {
-  font-size: $font-size-md;
-  font-weight: 700;
-  color: $text-heading;
-  margin: 0;
-  line-height: 1.4;
-  padding-top: 6px;
-  @include truncate;
-}
-
-.badges-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $space-xs;
-}
-
-.badge {
-  @include badge($badge-empty-color, $badge-empty-bg);
-
-  &.badge-area  { @include badge($badge-area-color, $badge-area-bg); }
-  &.badge-comp  { @include badge($badge-comp-color, $badge-comp-bg); }
-  &.badge-skill { @include badge($badge-skill-color, $badge-skill-bg); }
-  &.badge-day   { @include badge($badge-day-color, $badge-day-bg); }
-  &.badge-year  { @include badge($badge-year-color, $badge-year-bg); }
-  &.badge-empty { @include badge($badge-empty-color, $badge-empty-bg); }
-}
-
-.stats-row {
+.sim-info {
   display: flex;
   align-items: center;
   gap: $space-md;
-  padding: $space-md 0;
-  border-top: 1px solid $border-color;
-  border-bottom: 1px solid $border-color;
-  margin-top: auto;
+  flex: 1;
 
-  .stat {
+  .sim-icon-wrap {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    background: $bg-subtle;
+    border-radius: $radius-md;
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-size: $font-size-sm;
+    justify-content: center;
 
-    .stat-icon {
-      font-size: 16px;
-      &.blue  { color: $area-mt-color; }
-      &.muted { color: $text-muted; }
+    .material-icons {
+      color: $color-primary;
+      font-size: 24px;
     }
-
-    .stat-value {
-      font-weight: 700;
-      color: $text-heading;
-    }
-
-    .stat-label { color: $text-muted; }
   }
 
-  .stat-divider {
-    width: 1px;
-    height: 16px;
-    background: $border-color;
+  .sim-title {
+    font-size: $font-size-md;
+    font-weight: 700;
+    color: $text-heading;
+    margin: 0 0 6px 0;
+  }
+
+  .badges-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+
+    .badge {
+      @include badge($text-muted, $bg-subtle);
+      border: 1px solid $border-color;
+      font-size: 11px;
+    }
+
+    .badge-area {
+      background: $area-mt-bg;
+      color: $area-mt-color;
+      border-color: rgba($area-mt-color, 0.2);
+    }
   }
 }
 
-.card-actions {
+.sim-stats {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: $space-lg;
+  padding: 0 $space-xl;
+  border-left: 1px solid $border-color;
+  border-right: 1px solid $border-color;
 
-  .btn-action.view {
-    @include btn-primary;
-    padding: 6px 14px;
-    font-size: 13px;
-    box-shadow: none;
-    border-radius: $radius-sm;
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .stat-value {
+      font-weight: 800;
+      color: $text-heading;
+      font-size: 18px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: $text-muted;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-top: -2px;
+    }
   }
 
-  .action-group {
+  @include tablet {
+    border: none;
+    padding: 0;
+  }
+}
+
+.sim-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .btn-start {
+    @include btn-primary;
+    padding: 8px 16px;
+    border-radius: $radius-full;
+
+    .material-icons {
+      font-size: 18px;
+    }
+  }
+
+  .btn-icon {
+    background: transparent;
+    border: 1px solid transparent;
+    color: $text-muted;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: $radius-full;
     display: flex;
-    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    transition: $transition-fast;
 
-    .btn-icon {
-      background: transparent;
-      border: none;
-      color: $text-muted;
-      cursor: pointer;
-      padding: 6px;
-      border-radius: $radius-sm;
-      transition: $transition-fast;
+    &:hover.edit {
+      background: $color-primary-pale;
+      color: $color-primary;
+      border-color: rgba($color-primary, 0.2);
+    }
 
-      &:hover.edit { color: $color-primary; background: $color-primary-pale; }
-      &:hover.delete { color: $color-danger; background: $color-danger-pale; }
+    &:hover.delete {
+      background: #fef2f2;
+      color: #ef4444;
+      border-color: rgba(#ef4444, 0.2);
+    }
+
+    .material-icons {
+      font-size: 20px;
     }
   }
 }
@@ -203,34 +209,34 @@
     width: 64px;
     height: 64px;
     background: $color-primary-pale;
-    border-radius: $radius-xl;
+    border-radius: $radius-full;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: $space-sm;
+    margin-bottom: 8px;
 
     .material-icons {
-      font-size: 30px;
+      font-size: 32px;
       color: $color-primary;
     }
   }
 
   .empty-title {
-    font-size: $font-size-lg;
+    font-size: 18px;
     font-weight: 700;
     color: $text-heading;
     margin: 0;
   }
 
   .empty-sub {
-    font-size: $font-size-md;
+    font-size: 14px;
     color: $text-muted;
-    margin: 0;
-    max-width: 360px;
+    margin: 0 0 16px 0;
+    max-width: 400px;
   }
 
   .btn-create-empty {
     @include btn-primary;
-    margin-top: $space-sm;
+    border-radius: $radius-full;
   }
 }
