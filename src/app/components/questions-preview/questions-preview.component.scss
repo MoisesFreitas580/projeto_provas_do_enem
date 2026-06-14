@@ -1,59 +1,64 @@
 @use 'variables' as *;
 @use 'mixins' as *;
 
+// ── Overlay ────────────────────────────────────────────────────────────────
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(15, 23, 42, 0.65);
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(4px);
+  z-index: 1000;
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 9999;
+  justify-content: center;
   padding: $space-lg;
-  box-sizing: border-box;
+  animation: fadeOverlay 0.2s ease;
 }
 
 .modal-content {
   background: $bg-card;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-lg;
   width: 100%;
-  max-width: 850px;
-  max-height: 90vh; 
-  border-radius: $radius-lg;
+  max-width: 760px;
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: $shadow-lg;
-  animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes modalIn {
-  from { opacity: 0; transform: translateY(20px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-
+// ── Header ─────────────────────────────────────────────────────────────────
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   padding: $space-lg $space-xl;
   border-bottom: 1px solid $border-color;
+  background: $bg-subtle;
+  flex-shrink: 0;
 
   .header-info {
+    display: flex;
+    flex-direction: column;
+    gap: $space-sm;
+
     h2 {
-      margin: 0 0 $space-sm 0;
+      margin: 0;
+      font-size: $font-size-lg;
+      font-weight: 700;
       color: $text-heading;
-      font-size: $font-size-xl;
-      font-weight: 800;
     }
+
     .badges {
       display: flex;
+      gap: 6px;
       flex-wrap: wrap;
-      gap: $space-sm;
-      .badge-area { @include badge($badge-area-color, $badge-area-bg); }
+
+      .badge-area  { @include badge($badge-area-color,  $badge-area-bg);  }
       .badge-skill { @include badge($badge-skill-color, $badge-skill-bg); }
-      .badge-year { @include badge($badge-year-color, $badge-year-bg); }
+      .badge-year  { @include badge($badge-year-color,  $badge-year-bg);  }
+      .badge-type  { @include badge($badge-day-color,   $badge-day-bg);   }
     }
   }
 
@@ -63,107 +68,178 @@
     color: $text-muted;
     cursor: pointer;
     padding: 6px;
-    border-radius: $radius-sm;
+    border-radius: $radius-md;
+    display: flex;
     transition: $transition-fast;
-    &:hover { background: $bg-subtle; color: $color-danger; }
+    flex-shrink: 0;
+
+    .material-symbols-outlined { font-size: 22px; }
+    &:hover { color: $text-heading; background: $border-color; }
   }
 }
 
-
+// ── Body ───────────────────────────────────────────────────────────────────
 .modal-body {
   flex: 1;
   overflow-y: auto;
   padding: $space-xl;
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
   @include custom-scrollbar;
+}
 
-  .support-content {
-    margin-bottom: $space-xl;
+// ── Loading ────────────────────────────────────────────────────────────────
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: $space-md;
+  color: $text-muted;
 
-    .support-text {
-      font-size: 16px;
-      line-height: 1.8;
-      color: $text-body;
-      margin-bottom: $space-md;
-      text-align: justify;
-    }
+  .spinner { font-size: 32px; color: $color-primary; animation: spin 1s linear infinite; }
+  p { font-size: $font-size-md; margin: 0; }
+}
 
-    .image-wrapper {
-      text-align: center;
-      margin: $space-lg 0;
-      .support-image {
-        max-width: 100%;
-        border-radius: $radius-sm;
-        border: 1px solid $border-color;
-      }
-    }
-  }
+// ── Suporte / contexto ─────────────────────────────────────────────────────
+.support-content {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+  background: $bg-subtle;
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+  padding: $space-lg;
 
-  .statement-box {
-    background: $bg-subtle;
-    padding: $space-md $space-lg;
-    border-left: 4px solid $color-primary;
-    border-radius: 0 $radius-md $radius-md 0;
-    margin-bottom: $space-xl;
+  &:empty { display: none; }
+}
 
-    p {
-      margin: 0;
-      font-size: 16px;
-      color: $text-heading;
-      line-height: 1.6;
-    }
-  }
+.support-text {
+  font-size: $font-size-md;
+  color: $text-body;
+  line-height: 1.7;
+  margin: 0;
+  white-space: pre-line;
+}
 
-  .alternatives-group {
-    display: flex;
-    flex-direction: column;
-    gap: $space-sm;
+// ── Imagem ─────────────────────────────────────────────────────────────────
+.image-wrapper {
+  display: flex;
+  justify-content: center;
+  background: #fff;
+  border-radius: $radius-md;
+  border: 1px solid $border-color;
+  padding: $space-md;
+  overflow: hidden;
+}
 
-    .alternative-card {
-      display: flex;
-      align-items: flex-start;
-      gap: $space-md;
-      padding: $space-md;
-      border: 1px solid $border-color;
-      border-radius: $radius-md;
-      background: $bg-card;
+.support-image {
+  max-width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  border-radius: $radius-sm;
+}
 
-      &.readonly {
-        cursor: default;
-      }
+// ── Enunciado ──────────────────────────────────────────────────────────────
+.statement-box {
+  background: $color-primary-pale;
+  border-left: 3px solid $color-primary;
+  border-radius: 0 $radius-md $radius-md 0;
+  padding: $space-md $space-lg;
 
-      .alt-letter {
-        font-weight: 700;
-        color: $text-heading;
-        background: $bg-subtle;
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        flex-shrink: 0;
-        border: 1px solid $border-color;
-      }
-
-      .alt-text {
-        font-size: 15px;
-        color: $text-body;
-        line-height: 1.6;
-        margin-top: 4px;
-      }
-    }
+  p {
+    margin: 0;
+    font-size: $font-size-md;
+    color: $text-heading;
+    line-height: 1.65;
+    font-weight: 500;
+    white-space: pre-line;
   }
 }
 
+// ── Alternativas (somente leitura) ─────────────────────────────────────────
+.alternatives-group {
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+}
+
+.alternative-card.readonly {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-md;
+  padding: $space-md $space-lg;
+  border: 1.5px solid $border-color;
+  border-radius: $radius-md;
+  background: $bg-card;
+  transition: $transition-fast;
+
+  &:hover { background: $bg-subtle; border-color: #cbd5e1; }
+
+  .alt-letter {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border-radius: 50%;
+    background: $bg-subtle;
+    border: 1.5px solid $border-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $font-size-sm;
+    font-weight: 700;
+    color: $text-muted;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .alt-text {
+    font-size: $font-size-md;
+    color: $text-body;
+    line-height: 1.6;
+    flex: 1;
+    margin: 0;
+    white-space: pre-line;
+  }
+}
+
+// ── Empty / erro ───────────────────────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-sm;
+  text-align: center;
+  padding: 48px;
+  color: $text-muted;
+
+  .material-symbols-outlined { font-size: 32px; color: $color-danger; }
+  p { margin: 0; font-size: $font-size-md; }
+}
+
+// ── Footer ─────────────────────────────────────────────────────────────────
 .modal-footer {
   padding: $space-md $space-xl;
   border-top: 1px solid $border-color;
   display: flex;
   justify-content: flex-end;
   background: $bg-subtle;
-  border-radius: 0 0 $radius-lg $radius-lg;
+  flex-shrink: 0;
 
-  .btn-primary {
-    @include btn-primary;
-  }
+  .btn-primary { @include btn-primary; }
+}
+
+// ── Animações ─────────────────────────────────────────────────────────────
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+@keyframes fadeOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }

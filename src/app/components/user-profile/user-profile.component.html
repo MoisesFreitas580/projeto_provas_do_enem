@@ -1,0 +1,89 @@
+<div class="profile-container">
+
+  <header class="page-header">
+    <div class="header-icon">
+      <span class="material-icons">manage_accounts</span>
+    </div>
+    <div>
+      <p class="page-label">Configurações</p>
+      <h1 class="page-title">Meu Perfil</h1>
+      <p class="page-subtitle">Faça a gestão das suas informações pessoais e credenciais de acesso à plataforma.</p>
+    </div>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-overlay">
+      <span class="material-icons spinner">sync</span>
+      <p>A carregar o seu perfil...</p>
+    </div>
+  } @else {
+    
+    <div class="profile-grid">
+      
+      <section class="profile-card">
+        <div class="card-header">
+          <h2>Informações Pessoais</h2>
+          <p>Atualize o seu nome de exibição.</p>
+        </div>
+
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nome Completo</label>
+              <input type="text" class="custom-input" [(ngModel)]="editName" placeholder="Seu nome">
+            </div>
+            
+            <div class="form-group">
+              <label>Tipo de Conta</label>
+              <input type="text" class="custom-input disabled" [value]="getRoleLabel(userData?.role)" disabled>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>E-mail (Credencial de acesso)</label>
+            <div class="input-with-icon">
+              <span class="material-icons">email</span>
+              <input type="email" class="custom-input disabled" [value]="userData?.email" disabled>
+            </div>
+            <span class="help-text">O e-mail não pode ser alterado. Entre em contacto com o suporte caso seja necessário.</span>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <button class="btn-primary" (click)="saveProfile()" [disabled]="isSaving() || editName === userData?.name || !editName.trim()">
+            @if (isSaving()) {
+              <span class="material-icons spinner">sync</span> Guardando...
+            } @else {
+              <span class="material-icons">save</span> Salvar Alterações
+            }
+          </button>
+        </div>
+      </section>
+
+      <section class="profile-card danger-zone">
+        <div class="card-header">
+          <h2>Zona de Perigo</h2>
+          <p>Atenção: A exclusão da conta é um processo irreversível.</p>
+        </div>
+
+        <div class="card-body">
+          <div class="danger-warning">
+            <span class="material-icons">warning_amber</span>
+            <div>
+              <strong>Perda permanente de dados</strong>
+              <p>Ao excluir a sua conta, perderá o acesso a todos os simulados criados, histórico de resoluções, tempo de estudo e relatórios de desempenho. Não será possível recuperar estas informações.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer bg-danger">
+          <button class="btn-danger" (click)="deleteAccount()">
+            <span class="material-icons">delete_forever</span> Excluir a minha conta
+          </button>
+        </div>
+      </section>
+
+    </div>
+  }
+
+</div>

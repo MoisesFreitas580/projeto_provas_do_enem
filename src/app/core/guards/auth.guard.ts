@@ -23,7 +23,6 @@ export const authGuard: CanActivateFn = () => {
     return false;
   }
 
-  // status === 'access' → token válido, acesso permitido
   $auth.is_logged.set(true);
   return true;
 };

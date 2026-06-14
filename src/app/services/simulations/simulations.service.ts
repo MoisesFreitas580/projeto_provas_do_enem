@@ -11,7 +11,7 @@ export class SimulationsService {
   private base_url = this.api + 'simulations';
   private $http = inject(HttpClient);
 
-  // POST /simulations
+  // POST /simulations [Não Usado]
   public createSimulation(body: any): Observable<any> {
     return this.$http.post<any>(this.base_url, body);
   }
@@ -33,10 +33,8 @@ export class SimulationsService {
   }
 
 
-  // POST /simulations/generate
-  // O body suporta strategy (exact_exam, random, manual), type, year, quantity, filters, etc.
+  // POST /simulations/generate.
   public generateSimulation(body: any): Observable<any> {
-    
     return this.$http.post<any>(`${this.base_url}/generate`, body);
   }
 

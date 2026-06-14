@@ -1,265 +1,278 @@
 @use 'variables' as *;
 @use 'mixins' as *;
 
+// ── Overlay ────────────────────────────────────────────────────────────────
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(15, 23, 42, 0.65);
-    backdrop-filter: blur(4px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    padding: $space-lg;
-    box-sizing: border-box;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 950;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-lg;
+  animation: fadeOverlay 0.2s ease;
 }
 
-.search-modal {
-    background: $bg-card;
-    width: 100%;
-    max-width: 850px;
-    height: 85vh; 
-    display: flex;
-    flex-direction: column;
-    border-radius: $radius-lg;
-    box-shadow: $shadow-lg;
-    animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+.modal-content.search-modal {
+  background: $bg-card;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-lg;
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes modalIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.98);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
+// ── Header ─────────────────────────────────────────────────────────────────
 .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: $space-lg $space-xl;
+  border-bottom: 1px solid $border-color;
+  flex-shrink: 0;
+
+  h2 {
+    margin: 0 0 2px;
+    font-size: $font-size-lg;
+    font-weight: 800;
+    color: $text-heading;
+    letter-spacing: -0.02em;
+  }
+
+  .modal-subtitle {
+    margin: 0;
+    font-size: $font-size-sm;
+    color: $text-muted;
+  }
+
+  .btn-close {
+    background: transparent;
+    border: none;
+    color: $text-muted;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: $radius-md;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: $space-lg $space-xl;
-    border-bottom: 1px solid $border-color;
+    transition: $transition-fast;
+    flex-shrink: 0;
 
-    h2 {
-        margin: 0;
-        font-size: $font-size-xl;
-        color: $text-heading;
-    }
-
-    .btn-close {
-        background: transparent;
-        border: none;
-        color: $text-muted;
-        cursor: pointer;
-        padding: 6px;
-        border-radius: $radius-sm;
-        transition: $transition-fast;
-
-        &:hover {
-            background: $bg-subtle;
-            color: $color-danger;
-        }
-    }
+    .material-symbols-outlined { font-size: 22px; }
+    &:hover { color: $text-heading; background: $border-color; }
+  }
 }
 
-.modal-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    padding: $space-xl;
-    gap: $space-lg;
-}
-
+// ── Filtros ───────────────────────────────────────────────────────────────
 .filters-bar {
-    display: flex;
-    align-items: flex-end;
-    gap: $space-md;
-    background: $bg-subtle;
-    padding: $space-md;
-    border-radius: $radius-md;
-    border: 1px solid $border-color;
+  display: flex;
+  align-items: flex-end;
+  gap: $space-md;
+  padding: $space-lg $space-xl;
+  border-bottom: 1px solid $border-color;
+  background: $bg-subtle;
+  flex-shrink: 0;
+  flex-wrap: wrap;
 
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        flex: 1;
-
-        label {
-            font-size: 13px;
-            font-weight: 600;
-            color: $text-muted;
-        }
-
-        input,
-        select {
-            padding: 10px;
-            border: 1px solid $border-color;
-            border-radius: $radius-sm;
-            font-family: inherit;
-            font-size: 14px;
-
-            &:focus {
-                outline: none;
-                border-color: $color-primary;
-            }
-        }
-    }
-
-    .btn-primary {
-        @include btn-primary;
-        height: 42px;
-    }
-}
-
-.results-container {
-    flex: 1;
-    overflow-y: auto;
-    border: 1px solid $border-color;
-    border-radius: $radius-md;
-    background: white;
-    @include custom-scrollbar;
-
-    .state-message {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        color: $text-muted;
-
-        .spinner {
-            font-size: 36px;
-            color: $color-primary;
-            animation: spin 1s linear infinite;
-            margin-bottom: 12px;
-        }
-    }
-}
-
-.questions-list {
+  .form-group {
     display: flex;
     flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 140px;
 
-    .question-item {
-        display: flex;
-        gap: $space-md;
-        padding: $space-md;
-        border-bottom: 1px solid $border-color;
-        cursor: pointer;
-        transition: $transition-fast;
-
-        &:last-child {
-            border-bottom: none;
-        }
-
-        &:hover {
-            background: $bg-subtle;
-        }
-
-        &.selected {
-            background: $color-primary-pale;
-            border-left: 3px solid $color-primary;
-
-            .q-content .q-id {
-                color: $color-primary;
-            }
-        }
-
-        .checkbox-wrapper {
-            padding-top: 4px;
-
-            input {
-                cursor: pointer;
-                width: 18px;
-                height: 18px;
-                accent-color: $color-primary;
-            }
-        }
-
-        .q-content {
-            flex: 1;
-
-            .badges {
-                display: flex;
-                gap: 8px;
-                margin-bottom: 8px;
-
-                .badge-area {
-                    @include badge($badge-area-color, $badge-area-bg);
-                }
-
-                .badge-year {
-                    @include badge($badge-year-color, $badge-year-bg);
-                }
-            }
-
-            .q-text {
-                margin: 0 0 8px 0;
-                font-size: 14px;
-                color: $text-heading;
-                line-height: 1.5;
-            }
-
-            .q-id {
-                font-size: 12px;
-                color: $text-placeholder;
-                font-family: monospace;
-            }
-        }
+    label {
+      font-size: $font-size-xs;
+      font-weight: 700;
+      color: $text-muted;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
+
+    select, input {
+      padding: 9px 12px;
+      font-size: $font-size-sm;
+      border: 1.5px solid $border-color;
+      border-radius: $radius-md;
+      background: $bg-card;
+      color: $text-heading;
+      outline: none;
+      transition: $transition-fast;
+
+      &:focus { border-color: $color-primary; box-shadow: 0 0 0 3px rgba($color-primary, 0.1); }
+      &::placeholder { color: $text-placeholder; }
+    }
+  }
 }
 
-.modal-footer {
-    padding: $space-md $space-xl;
-    border-top: 1px solid $border-color;
+.btn-search {
+  @include btn-primary;
+  gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  .material-symbols-outlined { font-size: 18px; }
+  .spin { animation: spin 0.9s linear infinite; }
+}
+
+// ── Body ───────────────────────────────────────────────────────────────────
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: $space-lg $space-xl;
+  @include custom-scrollbar;
+}
+
+// ── Estados ────────────────────────────────────────────────────────────────
+.state-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-md;
+  padding: 56px 20px;
+  color: $text-muted;
+  text-align: center;
+
+  .spinner { font-size: 32px; color: $color-primary; animation: spin 1s linear infinite; }
+  .material-symbols-outlined { font-size: 32px; color: $text-placeholder; }
+  p { margin: 0; font-size: $font-size-md; }
+}
+
+// ── Lista de questões ─────────────────────────────────────────────────────
+.questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+}
+
+.question-item {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-md;
+  padding: $space-md;
+  border: 1.5px solid $border-color;
+  border-radius: $radius-md;
+  background: $bg-card;
+  cursor: pointer;
+  transition: $transition-fast;
+
+  &:hover   { background: $bg-subtle; border-color: #cbd5e1; }
+  &.selected { background: $color-primary-pale; border-color: $color-primary; }
+
+  .checkbox-wrapper {
+    padding-top: 2px;
+    input { accent-color: $color-primary; cursor: pointer; }
+  }
+
+  .q-content {
+    flex: 1;
+    min-width: 0;
+
+    .badges {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+
+      .badge-area  { @include badge($badge-area-color,  $badge-area-bg);  }
+      .badge-year  { @include badge($badge-year-color,  $badge-year-bg);  }
+      .badge-type  { @include badge($badge-day-color,   $badge-day-bg);   }
+      .badge-skill { @include badge($badge-skill-color, $badge-skill-bg); }
+    }
+
+    .q-text {
+      font-size: $font-size-sm;
+      color: $text-body;
+      margin: 0;
+      line-height: 1.55;
+      overflow: hidden;
+      display: -webkit-box;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+  }
+
+  .btn-eye {
+    background: transparent;
+    border: none;
+    color: $text-muted;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: $radius-sm;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: $bg-subtle;
-    border-radius: 0 0 $radius-lg $radius-lg;
+    flex-shrink: 0;
+    transition: $transition-fast;
 
-    .selection-count {
-        font-size: 14px;
-        font-weight: 700;
-        color: $color-primary;
-    }
-
-    .actions {
-        display: flex;
-        gap: $space-md;
-
-        .btn-secondary {
-            background: white;
-            border: 1px solid $border-color;
-            color: $text-body;
-            padding: 10px 20px;
-            border-radius: $radius-md;
-            cursor: pointer;
-            font-weight: 600;
-
-            &:hover {
-                background: #e2e8f0;
-            }
-        }
-
-        .btn-primary {
-            @include btn-primary;
-        }
-    }
+    .material-symbols-outlined { font-size: 19px; }
+    &:hover { color: $color-primary; background: $color-primary-pale; }
+  }
 }
 
-@keyframes spin {
-    100% {
-        transform: rotate(360deg);
-    }
+// ── Footer ─────────────────────────────────────────────────────────────────
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $space-md;
+  padding: $space-md $space-xl;
+  border-top: 1px solid $border-color;
+  background: $bg-subtle;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.selection-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: $font-size-sm;
+  color: $text-muted;
+  font-weight: 600;
+  transition: color 0.2s;
+
+  .material-symbols-outlined { font-size: 18px; }
+
+  &.has-items { color: $color-primary; }
+}
+
+.actions {
+  display: flex;
+  gap: $space-md;
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1.5px solid $border-color;
+  color: $text-muted;
+  padding: 9px 20px;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $transition-fast;
+
+  &:hover { background: $bg-subtle; color: $text-body; }
+}
+
+.btn-primary {
+  @include btn-primary;
+  gap: 6px;
+  .material-symbols-outlined { font-size: 18px; }
+}
+
+// ── Animações ─────────────────────────────────────────────────────────────
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+@keyframes fadeOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }

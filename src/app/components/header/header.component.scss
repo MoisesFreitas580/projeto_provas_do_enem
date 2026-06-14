@@ -37,29 +37,7 @@
   gap: 10px;
 }
 
-.btn-create-simulado {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(255,255,255,0.12);
-  color: #ffffff;
-  border: 1px solid rgba(255,255,255,0.25);
-  padding: 8px 16px;
-  border-radius: $radius-md;
-  font-size: 13.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: $transition-smooth;
 
-  .material-icons { font-size: 17px; }
-
-  &:hover {
-    background: #ffffff;
-    color: $color-primary;
-    border-color: #ffffff;
-    box-shadow: $shadow-sm;
-  }
-}
 
 // ── Ícone de menu ────────────────────────────────────────────────────────
 .btn-icon {

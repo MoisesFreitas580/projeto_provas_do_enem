@@ -19,22 +19,32 @@
 
   .title-block {
     .section-label {
+      font-size: $font-size-md;
+      font-weight: 600;
+      color: $text-heading;
+      margin: 0;
+    }
+
+    h2 {
       font-size: $font-size-sm;
       font-weight: 700;
       color: $text-muted;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      margin: 0;
-    }
-
-    h2 {
-      font-size: 22px;
-      font-weight: 700;
-      color: $text-heading;
-      margin: 4px 0 0 0;
+      margin: 4px 0 0;
     }
   }
+}
 
+.btn-new {
+  @include btn-primary;
+  text-decoration: none;
+  border-radius: $radius-full;
+  padding: 9px 18px;
+
+  .material-icons {
+    font-size: 18px;
+  }
 }
 
 .simulations-list {
@@ -70,6 +80,7 @@
   align-items: center;
   gap: $space-md;
   flex: 1;
+  min-width: 0;
 
   .sim-icon-wrap {
     width: 48px;
@@ -87,29 +98,69 @@
     }
   }
 
+  .sim-details {
+    min-width: 0;
+  }
+
   .sim-title {
     font-size: $font-size-md;
     font-weight: 700;
     color: $text-heading;
-    margin: 0 0 6px 0;
+    margin: 0 0 6px;
+    @include truncate;
+  }
+}
+
+.badges-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  @include badge($text-muted, $bg-subtle);
+  border: 1px solid $border-color;
+  font-size: 11px;
+
+  &.badge-area {
+    background: $badge-area-bg;
+    color: $badge-area-color;
+    border-color: rgba($badge-area-color, 0.2);
   }
 
-  .badges-row {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
+  &.badge-comp {
+    background: $badge-comp-bg;
+    color: $badge-comp-color;
+    border-color: rgba($badge-comp-color, 0.2);
+  }
 
-    .badge {
-      @include badge($text-muted, $bg-subtle);
-      border: 1px solid $border-color;
-      font-size: 11px;
-    }
+  &.badge-skill {
+    background: $badge-skill-bg;
+    color: $badge-skill-color;
+    border-color: rgba($badge-skill-color, 0.2);
+  }
 
-    .badge-area {
-      background: $area-mt-bg;
-      color: $area-mt-color;
-      border-color: rgba($area-mt-color, 0.2);
-    }
+  &.badge-day {
+    background: $badge-day-bg;
+    color: $badge-day-color;
+    border-color: rgba($badge-day-color, 0.2);
+  }
+
+  &.badge-year {
+    background: $badge-year-bg;
+    color: $badge-year-color;
+    border-color: rgba($badge-year-color, 0.2);
+  }
+
+  &.badge-type {
+    background: $area-mt-bg;
+    color: $area-mt-color;
+    border-color: rgba($area-mt-color, 0.2);
+  }
+
+  &.badge-empty {
+    background: $badge-empty-bg;
+    color: $badge-empty-color;
   }
 }
 
@@ -119,12 +170,14 @@
   padding: 0 $space-xl;
   border-left: 1px solid $border-color;
   border-right: 1px solid $border-color;
+  flex-shrink: 0;
 
   .stat {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    min-width: 56px;
 
     .stat-value {
       font-weight: 800;
@@ -148,18 +201,38 @@
   }
 }
 
+// ── Ações ──────────────────────────────────────────────────────────────────
 .sim-actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 
   .btn-start {
     @include btn-primary;
     padding: 8px 16px;
     border-radius: $radius-full;
+    min-width: 124px;
+    justify-content: center;
 
     .material-icons {
       font-size: 18px;
+    }
+
+    .spin {
+      animation: spin 0.9s linear infinite;
+    }
+
+    &.loading {
+      opacity: 0.85;
+      cursor: wait;
+    }
+
+    &:disabled:not(.loading) {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
     }
   }
 
@@ -175,26 +248,25 @@
     justify-content: center;
     transition: $transition-fast;
 
-    &:hover.edit {
+    .material-icons {
+      font-size: 20px;
+    }
+
+    &.edit:hover {
       background: $color-primary-pale;
       color: $color-primary;
       border-color: rgba($color-primary, 0.2);
     }
 
-    &:hover.delete {
-      background: #fef2f2;
-      color: #ef4444;
-      border-color: rgba(#ef4444, 0.2);
-    }
-
-    .material-icons {
-      font-size: 20px;
+    &.delete:hover {
+      background: $color-danger-pale;
+      color: $color-danger;
+      border-color: rgba($color-danger, 0.2);
     }
   }
 }
 
 .empty-state {
-  grid-column: 1 / -1;
   background: $bg-card;
   border: 1.5px dashed $border-color;
   border-radius: $radius-lg;
@@ -231,12 +303,19 @@
   .empty-sub {
     font-size: 14px;
     color: $text-muted;
-    margin: 0 0 16px 0;
+    margin: 0 0 16px;
     max-width: 400px;
   }
 
   .btn-create-empty {
     @include btn-primary;
     border-radius: $radius-full;
+    text-decoration: none;
+  }
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
   }
 }

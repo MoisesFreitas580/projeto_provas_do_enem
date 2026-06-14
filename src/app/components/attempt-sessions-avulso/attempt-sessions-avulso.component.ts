@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AttemptSessionsService } from '@services/attempt-sessions/attempt-sessions.service';
+import { ToastService } from '@components/toast/toast.component.service'; // 🌟 Importação do Toast
 import { from, concatMap, toArray, finalize } from 'rxjs';
+import { ConfirmService } from '@components/confirm/confirm.component.service';
 
 interface QuestionState {
   isSeen: boolean;
@@ -24,6 +26,8 @@ export class AttemptSessionAvulsoComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private attemptService = inject(AttemptSessionsService);
   private cdr = inject(ChangeDetectorRef);
+  private toastService = inject(ToastService);
+  private confirmService = inject(ConfirmService);
 
   public avulsoId: string = '';
   public sessionTitle: string = 'Simulado Personalizado';
@@ -68,14 +72,13 @@ export class AttemptSessionAvulsoComponent implements OnInit, OnDestroy {
             };
           });
         }
-
         this.isLoading = false;
         this.startTimer(this.currentQuestionId);
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Erro ao carregar sessão', err);
-        alert('Erro ao carregar o simulado. Tente novamente.');
+        this.toastService.show('Erro ao carregar o simulado. Tente novamente.', 'error'); // 🌟 Toast
         this.isLoading = false;
         this.cdr.detectChanges();
       }
@@ -110,8 +113,17 @@ export class AttemptSessionAvulsoComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  public finishSession() {
-    if (!confirm('Tem certeza que deseja concluir o simulado? As questões não respondidas serão consideradas puladas.')) return;
+  public async finishSession() {
+    const confirmed = await this.confirmService.ask(
+      'Concluir Simulado',
+      'Tem certeza que deseja concluir o simulado? As questões não respondidas serão consideradas puladas.',
+      'Sim, Concluir',
+      'Voltar à prova'
+    );
+
+    if (!confirmed) return;
+
+    this.toastService.show('A guardar as suas respostas e a corrigir o simulado...', 'loading');
 
     this.isSubmitting = true;
     this.stopTimer(this.currentQuestionId);
@@ -140,7 +152,7 @@ export class AttemptSessionAvulsoComponent implements OnInit, OnDestroy {
       next: () => this.correctAndFinish(),
       error: (err) => {
         console.error('Erro ao salvar respostas em lote', err);
-        alert('Erro ao enviar respostas. Tente novamente.');
+        this.toastService.show('Erro ao enviar respostas. Tente novamente.', 'error'); // 🌟 Toast Error
       }
     });
   }
@@ -152,21 +164,30 @@ export class AttemptSessionAvulsoComponent implements OnInit, OnDestroy {
     this.attemptService.correctSession(this.avulsoId).subscribe({
       next: (res) => {
         this.isSubmitting = false;
+        this.toastService.show('Simulado corrigido com sucesso!', 'success'); // 🌟 Toast Success
         this.router.navigate(['/']);
       },
       error: () => {
         this.isSubmitting = false;
+        this.toastService.show('Ocorreu um erro na correção.', 'error'); // 🌟 Toast Error
         this.cdr.detectChanges();
       }
     });
   }
 
-  public abandonSession() {
-    if (!confirm('Se abandonar, o progresso não será corrigido. Deseja sair?')) return;
+  public async abandonSession() {
+    const confirmed = await this.confirmService.ask(
+      'Abandonar Simulado',
+      'Se abandonar, o progresso do simulado será encerrado sem correção. Deseja sair?',
+      'Sim, Abandonar',
+      'Cancelar'
+    );
+
+    if (!confirmed) return;
 
     this.attemptService.abandonSession(this.avulsoId).subscribe({
       next: () => this.router.navigate(['/']),
-      error: () => alert('Erro ao abandonar sessão.')
+      error: () => this.toastService.show('Erro ao abandonar sessão.', 'error') // 🌟 Toast Error
     });
   }
 

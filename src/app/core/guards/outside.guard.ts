@@ -6,7 +6,6 @@ export const outsideGuard: CanActivateFn = () => {
   const $auth = inject(AuthService);
   const $router = inject(Router);
 
-  // Se já tem sessão válida, redireciona para home
   if ($auth.isAuthenticated() === 'access') {
     $router.navigateByUrl('/');
     return false;

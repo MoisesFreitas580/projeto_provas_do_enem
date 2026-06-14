@@ -8,15 +8,15 @@ import { AuthService } from '../../core/helpers/auth.service';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
 })
 export class HeaderComponent {
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   public menuAberto   = false;
   public userMenuOpen = false;
 
-  // Signals do AuthService — usados diretamente no template
   public get isLogged():   boolean { return this.authService.is_logged(); }
   public get userName():   string  { return this.authService.currentUser()?.name ?? ''; }
   public get userInitial(): string { return this.userName.charAt(0).toUpperCase() || '?'; }
@@ -35,9 +35,9 @@ export class HeaderComponent {
     this.userMenuOpen = false;
     this.menuAberto   = false;
     this.authService.logout();
+    this.router.navigate(['/login']);
   }
 
-  // Fecha os menus ao clicar fora
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;

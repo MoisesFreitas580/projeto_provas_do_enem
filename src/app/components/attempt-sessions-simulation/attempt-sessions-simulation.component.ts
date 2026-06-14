@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AttemptSessionsService } from '@services/attempt-sessions/attempt-sessions.service';
 import { from, concatMap, toArray, finalize } from 'rxjs';
+import { ToastService } from '@components/toast/toast.component.service';
+import { ConfirmService } from '@components/confirm/confirm.component.service';
 
 interface QuestionState {
   isSeen: boolean;
@@ -24,8 +26,10 @@ export class AttemptSessionSimulationComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private attemptService = inject(AttemptSessionsService);
   private cdr = inject(ChangeDetectorRef);
+  private toastService = inject(ToastService); // 🌟 Injeção do Serviço
+  private confirmService = inject(ConfirmService);
 
-  public sessionId: string = '';
+  public simulationId: string = '';
   public questions: any[] = [];
   public currentQuestionIndex: number = 0;
 
@@ -35,9 +39,8 @@ export class AttemptSessionSimulationComponent implements OnInit, OnDestroy {
   public answersCache: Record<string, QuestionState> = {};
 
   ngOnInit() {
-    // 🌟 Lê o sessionId da URL
-    this.sessionId = this.route.snapshot.paramMap.get('sessionId') || '';
-    if (this.sessionId) {
+    this.simulationId = this.route.snapshot.paramMap.get('sessionId') || '';
+    if (this.simulationId) {
       this.loadSession();
     }
   }
@@ -49,12 +52,10 @@ export class AttemptSessionSimulationComponent implements OnInit, OnDestroy {
   get currentQuestion() { return this.questions[this.currentQuestionIndex]; }
   get currentQuestionId() { return this.currentQuestion?.id; }
 
-  // ── FLUXO DA SESSÃO ─────────────────────────────────────────────────────
   private loadSession() {
     this.isLoading = true;
-    this.attemptService.getSessionById(this.sessionId).subscribe({
-      next: (res) => {
-        // A mesma lógica de desestruturação que usamos na prova
+    this.attemptService.getSessionById(this.simulationId).subscribe({
+      next: (res: any) => {
         if (res && res.answers) {
           this.questions = res.answers.map((ans: any) => ans.question);
           res.answers.forEach((ans: any) => {
@@ -71,17 +72,17 @@ export class AttemptSessionSimulationComponent implements OnInit, OnDestroy {
 
         this.isLoading = false;
         this.startTimer(this.currentQuestionId);
-        this.cdr.detectChanges();
+        this.cdr.detectChanges(); 
       },
       error: (err) => {
         console.error('Erro ao carregar sessão', err);
+        this.toastService.show('Erro ao carregar o simulado. Tente novamente.', 'error');
         this.isLoading = false;
         this.cdr.detectChanges();
       }
     });
   }
 
-  // ── NAVEGAÇÃO E CRONÓMETRO ──────────────────────────────────────────────
   public goToQuestion(index: number) {
     if (index < 0 || index >= this.questions.length) return;
     this.stopTimer(this.currentQuestionId);
@@ -110,12 +111,20 @@ export class AttemptSessionSimulationComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  // ── ENVIO EM LOTE (OTIMIZADO) ──────────────────────────────────────────
-  public finishSession() {
-    if (!confirm('Tem certeza que deseja concluir o simulado? As questões não respondidas serão consideradas puladas.')) return;
+  public async finishSession() {
+    const confirmed = await this.confirmService.ask(
+      'Concluir Simulado',
+      'Tem certeza que deseja concluir o simulado? As questões não respondidas serão consideradas puladas.',
+      'Sim, Concluir',
+      'Voltar à prova'
+    );
+
+    if (!confirmed) return;
+
+    this.toastService.show('A finalizar o simulado e a processar a correção...', 'loading'); 
 
     this.isSubmitting = true;
-    this.stopTimer(this.currentQuestionId); 
+    this.stopTimer(this.currentQuestionId);
     this.cdr.detectChanges();
 
     const requests = this.questions.map(q => {
@@ -127,8 +136,7 @@ export class AttemptSessionSimulationComponent implements OnInit, OnDestroy {
         reviewCount: 1, 
         confidenceLevel: 3 
       };
-      // Envia usando a rota baseada no sessionId
-      return this.attemptService.answerQuestion(this.sessionId, q.id, payload);
+      return this.attemptService.answerQuestion(this.simulationId, q.id, payload);
     });
 
     from(requests).pipe(
@@ -142,7 +150,7 @@ export class AttemptSessionSimulationComponent implements OnInit, OnDestroy {
       next: () => this.correctAndFinish(),
       error: (err) => {
         console.error('Erro ao salvar respostas em lote', err);
-        alert('Erro ao enviar respostas. Tente novamente.');
+        this.toastService.show('Erro ao enviar respostas. Tente novamente.', 'error'); // 🌟 Toast Error
       }
     });
   }
@@ -151,25 +159,33 @@ export class AttemptSessionSimulationComponent implements OnInit, OnDestroy {
     this.isSubmitting = true;
     this.cdr.detectChanges();
 
-    this.attemptService.correctSession(this.sessionId).subscribe({
+    this.attemptService.correctSession(this.simulationId).subscribe({
       next: (res) => {
         this.isSubmitting = false;
-        alert('Simulado corrigido com sucesso!');
-        this.router.navigate(['/resultados', this.sessionId]); // Rota para feedback futuramente
+        this.toastService.show('Simulado corrigido com sucesso!', 'success'); // 🌟 Toast Success
+        this.router.navigate(['/resultados', this.simulationId]); // Rota para feedback futuramente
       },
       error: () => {
         this.isSubmitting = false;
+        this.toastService.show('Ocorreu um erro na correção.', 'error'); // 🌟 Toast Error
         this.cdr.detectChanges();
       }
     });
   }
 
-  public abandonSession() {
-    if (!confirm('Se abandonar, o progresso do simulado será encerrado sem correção. Deseja sair?')) return;
-    
-    this.attemptService.abandonSession(this.sessionId).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
-      error: () => alert('Erro ao abandonar simulado.')
+  public async abandonSession() {
+    const confirmed = await this.confirmService.ask(
+      'Abandonar Simulado',
+      'Se abandonar, o progresso do simulado será encerrado sem correção. Deseja sair?',
+      'Sim, Abandonar',
+      'Cancelar'
+    );
+
+    if (!confirmed) return;
+
+    this.attemptService.abandonSession(this.simulationId).subscribe({
+      next: () => this.router.navigate(['/']),
+      error: () => this.toastService.show('Erro ao abandonar simulado.', 'error') // 🌟 Toast Error
     });
   }
 

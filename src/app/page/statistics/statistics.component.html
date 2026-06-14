@@ -1,0 +1,161 @@
+<div class="statistics-container">
+
+  <header class="page-header">
+    <div class="header-icon">
+      <span class="material-icons">trending_up</span>
+    </div>
+    <div>
+      <p class="page-label">Meu Desempenho</p>
+      <h1 class="page-title">Relatório Geral de Estatísticas</h1>
+      <p class="page-subtitle">Acompanhe a sua evolução, tempo médio de resposta e foque nas áreas que exigem mais atenção.</p>
+    </div>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-overlay">
+      <span class="material-icons spinner">sync</span>
+      <p>A compilar os seus relatórios de desempenho...</p>
+    </div>
+  } @else {
+
+    <section class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-icon accuracy"><span class="material-icons">my_location</span></div>
+        <div class="metric-info">
+          <p class="metric-label">Precisão Global</p>
+          <h2 class="metric-value">{{ overview?.accuracy | number:'1.0-1' }}%</h2>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon total"><span class="material-icons">library_books</span></div>
+        <div class="metric-info">
+          <p class="metric-label">Questões Respondidas</p>
+          <h2 class="metric-value">{{ overview?.answeredQuestions }} / {{ overview?.totalQuestions }}</h2>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon time"><span class="material-icons">timer</span></div>
+        <div class="metric-info">
+          <p class="metric-label">Tempo Médio p/ Questão</p>
+          <h2 class="metric-value">{{ formatTime(overview?.averageTimePerQuestionMs) }}</h2>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon sessions"><span class="material-icons">event_available</span></div>
+        <div class="metric-info">
+          <p class="metric-label">Sessões Concluídas</p>
+          <h2 class="metric-value">{{ overview?.totalSessions }}</h2>
+        </div>
+      </div>
+    </section>
+
+    <div class="dashboard-grid">
+      
+      <section class="stat-section col-span-2">
+        <div class="section-title">
+          <h3>Desempenho por Área de Conhecimento</h3>
+        </div>
+        <div class="area-stats-list">
+          @for (area of byArea; track area.area) {
+            <div class="area-item">
+              <div class="area-header">
+                <span class="area-chip" [class]="'area-' + area.area">{{ area.area }}</span>
+                <span class="area-accuracy">{{ area.accuracy | number:'1.0-1' }}% de acertos</span>
+              </div>
+              
+              <div class="progress-track">
+                <div class="progress-bar correct" [style.width.%]="area.accuracy"></div>
+                <div class="progress-bar wrong" [style.width.%]="(area.wrongQuestions / area.totalQuestions) * 100"></div>
+              </div>
+              
+              <div class="area-details">
+                <span class="text-success"><span class="material-icons">check_circle</span> {{ area.correctQuestions }} certas</span>
+                <span class="text-danger"><span class="material-icons">cancel</span> {{ area.wrongQuestions }} erradas</span>
+                <span class="text-muted"><span class="material-icons">timer</span> {{ formatTime(area.averageTimePerQuestionMs) }} / questão</span>
+              </div>
+            </div>
+          } @empty {
+            <p class="empty-text">Ainda não há dados suficientes.</p>
+          }
+        </div>
+      </section>
+
+      <section class="stat-section">
+        <div class="section-title">
+          <h3>Tipos de Treino</h3>
+        </div>
+        <div class="context-list">
+          @for (ctx of contextComparison; track ctx.type) {
+            <div class="context-item">
+              <div class="ctx-header">
+                <strong>{{ formatContextType(ctx.type) }}</strong>
+                <span class="badge">{{ ctx.totalSessions }} sessões</span>
+              </div>
+              <div class="ctx-metrics">
+                <div>
+                  <label>Precisão</label>
+                  <span>{{ ctx.accuracy | number:'1.0-1' }}%</span>
+                </div>
+                <div>
+                  <label>Tempo Médio</label>
+                  <span>{{ formatTime(ctx.averageTimePerQuestionMs) }}</span>
+                </div>
+              </div>
+            </div>
+          } @empty {
+            <p class="empty-text">Sem dados de contexto.</p>
+          }
+        </div>
+      </section>
+
+      <section class="stat-section col-span-full">
+        <div class="section-title warning">
+          <h3><span class="material-icons">warning_amber</span> Atenção: Questões Mais Erradas</h3>
+          <p>Reveja estas habilidades para melhorar o seu desempenho nas próximas tentativas.</p>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="stats-table">
+            <thead>
+              <tr>
+                <th>Questão</th>
+                <th>Competência / Habilidade</th>
+                <th>Tentativas / Erros</th>
+                <th>Tempo Médio</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of mostWrong; track item.questionId) {
+                <tr>
+                  <td>
+                    <div class="q-ident">
+                      <span class="badge badge-area">{{ item.area }}</span>
+                      <strong>Q{{ item.number }}</strong>
+                      <span class="text-xs text-muted">ENEM {{ item.exam?.year }} ({{ item.exam?.type }})</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="skill-info">
+                      <span class="badge badge-skill">{{ item.skill?.code }}</span>
+                      <span class="skill-desc">{{ item.skill?.description }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="error-count">
+                      <span class="material-icons text-danger">close</span>
+                      <b>{{ item.wrongCount }} vezes</b>
+                    </div>
+                  </td>
+                  <td>{{ formatTime(item.averageTimeMs) }}</td>
+                </tr>
+              } @empty {
+                <tr><td colspan="4" class="empty-text text-center">Excelente! Não tem questões com erros repetidos.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  }
+</div>

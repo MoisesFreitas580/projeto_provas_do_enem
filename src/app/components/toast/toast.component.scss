@@ -1,0 +1,99 @@
+@use 'variables' as *;
+
+.toast-container {
+  position: fixed;
+  bottom: $space-xl;
+  right: $space-xl;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: $space-md;
+  min-width: 300px;
+  max-width: 450px;
+  padding: 16px 20px;
+  background: $bg-card;
+  border-radius: $radius-md;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-left: 4px solid;
+
+  &.success {
+    border-left-color: #10b981;
+
+    .toast-icon {
+      color: #10b981;
+    }
+  }
+
+  &.error {
+    border-left-color: #ef4444;
+
+    .toast-icon {
+      color: #ef4444;
+    }
+  }
+
+  &.info {
+    border-left-color: #3b82f6;
+
+    .toast-icon {
+      color: #3b82f6;
+    }
+  }
+
+  &.loading {
+    border-left-color: $color-primary;
+
+    .toast-icon {
+      color: $color-primary;
+    }
+  }
+}
+
+.toast-message {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+  color: $text-heading;
+  line-height: 1.4;
+}
+
+.btn-close {
+  background: transparent;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  transition: 0.2s;
+
+  &:hover {
+    color: $text-heading;
+  }
+
+  .material-icons {
+    font-size: 18px;
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}

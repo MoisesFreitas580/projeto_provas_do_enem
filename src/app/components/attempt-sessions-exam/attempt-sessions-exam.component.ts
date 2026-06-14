@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AttemptSessionsService } from '@services/attempt-sessions/attempt-sessions.service';
 import { from, concatMap, toArray, finalize } from 'rxjs';
+import { ToastService } from '@components/toast/toast.component.service';
+import { ConfirmService } from '@components/confirm/confirm.component.service';
 
 interface QuestionState {
   isSeen: boolean;
@@ -23,7 +25,9 @@ export class AttemptSessionExamComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private attemptService = inject(AttemptSessionsService);
-  private cdr = inject(ChangeDetectorRef); 
+  private cdr = inject(ChangeDetectorRef);
+  private toastService = inject(ToastService);
+  private confirmService = inject(ConfirmService);
 
   public examId: string = '';
   public questions: any[] = [];
@@ -74,6 +78,7 @@ export class AttemptSessionExamComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Erro ao carregar sessão', err);
+        this.toastService.show('Erro ao carregar a prova. Tente novamente.', 'error');
         this.isLoading = false;
         this.cdr.detectChanges();
       }
@@ -109,13 +114,21 @@ export class AttemptSessionExamComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  public finishSession() {
-    if (!confirm('Tem certeza que deseja concluir a sessão? As questões não respondidas serão consideradas puladas.')) return;
+  public async finishSession() {
 
+    const confirmed = await this.confirmService.ask(
+      'Concluir Simulado',
+      'Tem certeza que deseja concluir o simulado? As questões não respondidas serão consideradas puladas.',
+      'Sim, Concluir',
+      'Voltar à prova'
+    );
+
+    if (!confirmed) return;
+    this.toastService.show('A processar as suas respostas e a corrigir a prova...', 'loading');
     this.isSubmitting = true;
     this.stopTimer(this.currentQuestionId);
     this.cdr.detectChanges();
-  
+
     const requests = this.questions.map(q => {
       const state = this.answersCache[q.id];
 
@@ -126,7 +139,7 @@ export class AttemptSessionExamComponent implements OnInit, OnDestroy {
         reviewCount: 1,
         confidenceLevel: 3
       };
-    
+
 
       return this.attemptService.answerQuestion(this.examId, q.id, payload);
     });
@@ -142,7 +155,7 @@ export class AttemptSessionExamComponent implements OnInit, OnDestroy {
       next: () => this.correctAndFinish(),
       error: (err) => {
         console.error('Erro ao salvar respostas em lote', err);
-        alert('Erro ao enviar respostas. Tente novamente.');
+        this.toastService.show('Erro ao enviar respostas. Tente novamente.', 'error');
       }
     });
   }
@@ -154,22 +167,30 @@ export class AttemptSessionExamComponent implements OnInit, OnDestroy {
     this.attemptService.correctSession(this.examId).subscribe({
       next: (res) => {
         this.isSubmitting = false;
-        alert('Sessão corrigida com sucesso!');
+        this.toastService.show('Prova corrigida com sucesso!', 'success');
         this.router.navigate(['/', this.examId]);
       },
       error: () => {
         this.isSubmitting = false;
+        this.toastService.show('Erro ao enviar respostas. Tente novamente.', 'error');
         this.cdr.detectChanges();
       }
     });
   }
 
-  public abandonSession() {
-    if (!confirm('Se abandonar, a sessão será encerrada sem correção. Deseja sair?')) return;
+  public async abandonSession() {
+    const confirmed = await this.confirmService.ask(
+      'Abandonar Simulado',
+      'Se abandonar, o progresso do simulado será encerrado sem correção. Deseja sair?',
+      'Sim, Abandonar',
+      'Cancelar'
+    );
+
+    if (!confirmed) return;
 
     this.attemptService.abandonSession(this.examId).subscribe({
       next: () => this.router.navigate(['/']),
-      error: () => alert('Erro ao abandonar sessão.')
+      error: () => this.toastService.show('Erro ao abandonar sessão.', 'error')
     });
   }
 

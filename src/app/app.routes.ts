@@ -10,6 +10,8 @@ import { AttemptSessionExamComponent } from '@components/attempt-sessions-exam/a
 import { GenerateSimulationComponent } from '@components/generate-simulation/generate-simulation.component';
 import { AttemptSessionSimulationComponent } from '@components/attempt-sessions-simulation/attempt-sessions-simulation.component';
 import { AttemptSessionAvulsoComponent } from '@components/attempt-sessions-avulso/attempt-sessions-avulso.component';
+import { UserProfileComponent } from '@components/user-profile/user-profile.component';
+import { StatisticsComponent } from '@page/statistics/statistics.component';
 
 export const routes: Routes = [
   {
@@ -26,6 +28,11 @@ export const routes: Routes = [
     path: 'simulations/:id',
     component: SimulationsDetailsComponent,
     canActivate: [authGuard],
+  },
+  {
+    path: 'profile',
+    component: UserProfileComponent,
+    canActivate: [authGuard]
   },
   {
     path: 'login',
@@ -58,10 +65,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
-    path: 'attempt-sessions-avulso/:avulsoId', 
+    path: 'attempt-sessions-avulso/:avulsoId',
     component: AttemptSessionAvulsoComponent,
     canActivate: [authGuard],
   },
+  { path: 'statistics', component: StatisticsComponent },
   {
     path: '**',
     redirectTo: '',

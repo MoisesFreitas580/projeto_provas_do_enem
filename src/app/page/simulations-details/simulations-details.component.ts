@@ -1,53 +1,49 @@
-import { ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SimulationsService } from '@services/simulations/simulations.service';
 import { AttemptSessionsService } from '@services/attempt-sessions/attempt-sessions.service';
-import { QuestionPreviewComponent } from "@components/questions-preview/questions-preview.component";
-import { QuestionSearchModalComponent } from "@components/question-search-modal/question-search-modal.component";
+import { QuestionPreviewComponent } from '@components/questions-preview/questions-preview.component';
+import { QuestionSearchModalComponent } from '@components/question-search-modal/question-search-modal.component';
 
 @Component({
   selector: 'app-simulations-details',
   templateUrl: './simulations-details.component.html',
   styleUrls: ['./simulations-details.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, QuestionPreviewComponent, QuestionSearchModalComponent]
+  imports: [CommonModule, RouterLink, FormsModule, QuestionPreviewComponent, QuestionSearchModalComponent],
 })
 export class SimulationsDetailsComponent implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private simulationsService = inject(SimulationsService);
-  private attemptSessionsService = inject(AttemptSessionsService);
-  private cdr = inject(ChangeDetectorRef);
+  private route               = inject(ActivatedRoute);
+  private router              = inject(Router);
+  private simulationsService  = inject(SimulationsService);
+  private attemptService      = inject(AttemptSessionsService);
+  private cdr                 = inject(ChangeDetectorRef);
 
-  public isLoading = true;
+  public isLoading         = true;
   public isStartingSession = false;
   public simulationId: string | null = null;
 
   public simulationDetails: any = null;
   public questions: any[] = [];
 
-  // Edição de Título
   public isEditingTitle = false;
   public editTitleValue = '';
+  public isSavingTitle  = false;
 
-  // Seleção de Questões
   public selectedQuestions = new Set<string>();
 
-  // Modais
   public isPreviewModalOpen = false;
-  public previewQuestionId = '';
-  public isSearchModalOpen = false;
+  public previewQuestionId  = '';
+  public isSearchModalOpen  = false;
 
   ngOnInit(): void {
     this.simulationId = this.route.snapshot.paramMap.get('simulationId');
-    if (this.simulationId) {
-      this.fetchQuestions();
-    }
+    if (this.simulationId) this.fetchQuestions();
   }
 
-  // ── Carregamento de Dados ───────────────────────────────────────────────
+
   private fetchQuestions(): void {
     this.isLoading = true;
     this.simulationsService.getSimulationQuestions(this.simulationId!).subscribe({
@@ -63,46 +59,57 @@ export class SimulationsDetailsComponent implements OnInit {
         alert('Erro ao carregar os detalhes do simulado.');
         this.isLoading = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
-  // ── Edição de Título ────────────────────────────────────────────────────
+
   public startEditingTitle(): void {
     this.editTitleValue = this.simulationDetails?.title || '';
     this.isEditingTitle = true;
   }
 
+  public cancelEditingTitle(): void {
+    this.isEditingTitle = false;
+    this.editTitleValue = this.simulationDetails?.title || '';
+  }
+
   public saveTitle(): void {
-    if (!this.editTitleValue.trim()) return;
-    
-    this.simulationsService.updateSimulationTitle(this.simulationId!, this.editTitleValue).subscribe({
+    const value = this.editTitleValue.trim();
+    if (!value || this.isSavingTitle) return;
+
+    this.isSavingTitle = true;
+    this.simulationsService.updateSimulationTitle(this.simulationId!, value).subscribe({
       next: () => {
-        this.simulationDetails.title = this.editTitleValue;
+        this.simulationDetails.title = value;
         this.isEditingTitle = false;
+        this.isSavingTitle  = false;
         this.cdr.detectChanges();
       },
       error: () => {
         alert('Erro ao atualizar o título.');
-        this.isEditingTitle = false;
-      }
+        this.isSavingTitle = false;
+        this.cdr.detectChanges();
+      },
     });
   }
 
-  // ── Seleção de Questões ─────────────────────────────────────────────────
+
+  public getQuestionId(item: any): string {
+    return item.question?.id || item.id;
+  }
+
   public toggleSelection(questionId: string): void {
-    if (this.selectedQuestions.has(questionId)) {
-      this.selectedQuestions.delete(questionId);
-    } else {
-      this.selectedQuestions.add(questionId);
-    }
+    this.selectedQuestions.has(questionId)
+      ? this.selectedQuestions.delete(questionId)
+      : this.selectedQuestions.add(questionId);
   }
 
   public toggleAll(): void {
-    if (this.selectedQuestions.size === this.questions.length) {
+    if (this.isAllSelected()) {
       this.selectedQuestions.clear();
     } else {
-      this.questions.forEach(q => this.selectedQuestions.add(q.question?.id || q.id));
+      this.questions.forEach(q => this.selectedQuestions.add(this.getQuestionId(q)));
     }
   }
 
@@ -110,65 +117,65 @@ export class SimulationsDetailsComponent implements OnInit {
     return this.questions.length > 0 && this.selectedQuestions.size === this.questions.length;
   }
 
-  // ── Iniciar Simulado (Avulso com Selecionadas) ──────────────────────────
-  public startSelectedPractice(): void {
-    if (this.selectedQuestions.size === 0) return;
-    
-    this.isStartingSession = true;
 
+  public startSelectedPractice(): void {
+    if (this.selectedQuestions.size === 0 || this.isStartingSession) return;
+
+    this.isStartingSession = true;
     const payload = {
       title: `Treino: ${this.simulationDetails?.title || 'Personalizado'}`,
-      questionIds: Array.from(this.selectedQuestions)
+      questionIds: Array.from(this.selectedQuestions),
     };
 
-    this.attemptSessionsService.createAvulsoSession(payload).subscribe({
+    this.attemptService.createAvulsoSession(payload).subscribe({
       next: (res) => {
         this.isStartingSession = false;
-        // Navega para a tela de resolução com o ID da sessão criada
         this.router.navigate(['/attempt-sessions-avulso', res.id]);
       },
       error: (err) => {
         console.error('Erro ao iniciar treino avulso:', err);
         alert('Erro ao preparar o simulado. Tente novamente.');
         this.isStartingSession = false;
-      }
+        this.cdr.detectChanges();
+      },
     });
   }
 
-  // ── Ações em Questões Individuais ───────────────────────────────────────
+
   public removeQuestion(questionId: string, event: Event): void {
     event.stopPropagation();
-    if (confirm('Deseja realmente remover esta questão do simulado?')) {
-      this.simulationsService.removeQuestionFromSimulation(this.simulationId!, questionId).subscribe({
-        next: () => {
-          this.questions = this.questions.filter(q => (q.question?.id || q.id) !== questionId);
-          this.selectedQuestions.delete(questionId);
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          alert('Erro ao remover questão. (Backend não implementado?)');
-        }
-      });
-    }
+    event.preventDefault();
+    if (!confirm('Deseja realmente remover esta questão do simulado?')) return;
+
+    this.simulationsService.removeQuestionFromSimulation(this.simulationId!, questionId).subscribe({
+      next: () => {
+        this.questions = this.questions.filter(q => this.getQuestionId(q) !== questionId);
+        this.selectedQuestions.delete(questionId);
+        this.cdr.detectChanges();
+      },
+      error: () => alert('Erro ao remover questão.'),
+    });
   }
 
-  public openQuestionPreview(question: any, event: Event): void {
+  public openQuestionPreview(item: any, event: Event): void {
     event.stopPropagation();
-    this.previewQuestionId = question.question?.id || question.id;
+    event.preventDefault();
+    this.previewQuestionId  = this.getQuestionId(item);
     this.isPreviewModalOpen = true;
   }
 
-  // ── Controlo de Modais ──────────────────────────────────────────────────
+
   public openAddQuestionsSearch(): void { this.isSearchModalOpen = true; }
-  public closeSearchModal(): void { this.isSearchModalOpen = false; }
+  public closeSearchModal(): void       { this.isSearchModalOpen = false; }
+
   public closePreviewModal(): void {
     this.isPreviewModalOpen = false;
-    this.previewQuestionId = '';
+    this.previewQuestionId  = '';
   }
 
   public addSelectedQuestions(questionIds: string[]): void {
-    this.isSearchModalOpen = false; 
-    this.isLoading = true; 
+    this.isSearchModalOpen = false;
+    this.isLoading = true;
 
     this.simulationsService.addQuestionsToSimulation(this.simulationId!, { questionIds }).subscribe({
       next: () => this.fetchQuestions(),
@@ -176,7 +183,13 @@ export class SimulationsDetailsComponent implements OnInit {
         alert('Ocorreu um erro ao vincular as questões.');
         this.isLoading = false;
         this.cdr.detectChanges();
-      }
+      },
     });
+  }
+
+  public getSnippet(item: any): string {
+    const text: string = item.question?.rawJson?.comando || '';
+    if (!text) return 'Sem enunciado disponível.';
+    return text.length > 180 ? text.slice(0, 180) + '…' : text;
   }
 }

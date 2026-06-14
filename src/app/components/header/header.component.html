@@ -1,21 +1,13 @@
 <header class="app-header">
 
-  <!-- Logo -->
   <a class="logo-container" routerLink="/">
     <img src="app/assets/logo-branca.png" alt="IFCE" class="logo">
   </a>
 
-  <!-- Ações — visíveis apenas quando logado -->
   @if (isLogged) {
     <div class="header-actions">
 
-      <!-- Botão criar simulado -->
-      <button class="btn-create-simulado">
-        <span class="material-icons">add</span>
-        <span>Criar simulado</span>
-      </button>
 
-      <!-- Menu de áreas (grid) -->
       <div class="menu-container">
         <button
           class="btn-icon"
@@ -32,10 +24,10 @@
               <div class="icon-wrapper badge-teal">
                 <span class="material-icons">trending_up</span>
               </div>
-              <div class="perf-text">
+              <a class="perf-text" routerLink="/statistics">
                 <span class="label">Meu desempenho</span>
                 <span class="sublabel">Relatórios e estatísticas</span>
-              </div>
+              </a>
               <span class="material-icons arrow-icon">chevron_right</span>
             </button>
 
@@ -103,10 +95,10 @@
 
             <div class="dropdown-divider"></div>
 
-            <button class="user-menu-item">
+            <a class="user-menu-item"  routerLink="/profile">
               <span class="material-icons">person_outline</span>
               <span>Meu perfil</span>
-            </button>
+            </a>
             <button class="user-menu-item">
               <span class="material-icons">settings</span>
               <span>Configurações</span>

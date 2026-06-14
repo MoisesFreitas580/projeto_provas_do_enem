@@ -1,23 +1,23 @@
 <div class="modal-overlay" (click)="closePreview()">
   <div class="modal-content" (click)="$event.stopPropagation()">
-    
+
+    <!-- ── Header ──────────────────────────────────────────────────────── -->
     <div class="modal-header">
       <div class="header-info">
         <h2>Pré-visualização da Questão</h2>
         @if (question) {
-          <div class="badges">
-            <span class="badge-area">{{ question.area || 'Geral' }}</span>
-            
-            @if (question.skill?.code) {
-              <span class="badge-skill">Habilidade {{ question.skill.code }}</span>
-            }
-            @if (question.exam?.year) {
-              <span class="badge-year">ENEM {{ question.exam.year }}</span>
-            }
-            @if (question.exam?.type) {
-              <span class="badge-year">{{ question.exam.type }}</span> 
-            }
-          </div>
+        <div class="badges">
+          <span class="badge-area">{{ question.area || 'Geral' }}</span>
+          @if (question.skill?.code) {
+          <span class="badge-skill">{{ question.skill.code }}</span>
+          }
+          @if (question.exam?.year) {
+          <span class="badge-year">ENEM {{ question.exam.year }}</span>
+          }
+          @if (question.exam?.type) {
+          <span class="badge-type">{{ question.exam.type }}</span>
+          }
+        </div>
         }
       </div>
       <button class="btn-close" (click)="closePreview()" title="Fechar">
@@ -25,58 +25,56 @@
       </button>
     </div>
 
+    <!-- ── Body ────────────────────────────────────────────────────────── -->
     <div class="modal-body">
-      
+
       @if (isLoading) {
-        <div class="loading-state">
-          <span class="material-symbols-outlined spinner">sync</span>
-          <p>A carregar detalhes da questão...</p>
-        </div>
-      } 
-      @else if (question) {
+      <div class="loading-state">
+        <span class="material-symbols-outlined spinner">sync</span>
+        <p>A carregar detalhes da questão...</p>
+      </div>
+      } @else if (question) {
 
-        <div class="support-content">
-          @for (block of question.blocks; track block.id) {
-            
-            @if (block.type === 'TEXT' && block.text !== question.rawJson?.comando) {
-              <div class="support-text" [innerHTML]="block.text"></div>
-            } 
-            @else if (block.type === 'IMAGE') {
-              <div class="image-wrapper">
-                <img [src]="block.imageUrl || 'https://placehold.co/600x300?text=Imagem+Ausente'" 
-                     onerror="this.src='https://placehold.co/600x300?text=Erro+ao+carregar+imagem'"
-                     alt="Ilustração da questão" 
-                     class="support-image" />
-              </div>
-            }
-            
-          }
-        </div>
-
-        @if (question.rawJson?.comando) {
-          <div class="statement-box">
-            <p><strong>{{ question.rawJson.comando }}</strong></p>
-          </div>
+      <div class="support-content">
+        @for (block of question.blocks; track block.id) {
+        @if (isSupportText(block) && block.text) {
+        <p class="support-text">{{ block.text }}</p>
         }
-
-        <div class="alternatives-group">
-          @for (alt of question.alternatives; track alt.id) {
-            <div class="alternative-card readonly">
-              <div class="alt-letter">{{ alt.letter }}</div>
-              <div class="alt-text" [innerHTML]="alt.text"></div>
-            </div>
-          }
+        @if (block.type === 'IMAGE') {
+        <div class="image-wrapper">
+          <img [src]="block.imageUrl || 'https://placehold.co/600x300?text=Imagem+Ausente'"
+            onerror="this.src='https://placehold.co/600x300?text=Erro+ao+carregar+imagem'" alt="Ilustração da questão"
+            class="support-image" />
         </div>
+        }
+        }
+      </div>
 
-      } 
-      @else {
-        <div class="empty-state">
-          <p>Erro ao carregar os dados da questão.</p>
+      @if (question.rawJson?.comando) {
+      <div class="statement-box">
+        <p>{{ question.rawJson.comando }}</p>
+      </div>
+      }
+
+      <div class="alternatives-group">
+        @for (alt of question.alternatives; track alt.id) {
+        <div class="alternative-card readonly">
+          <div class="alt-letter">{{ alt.letter }}</div>
+          <p class="alt-text">{{ alt.text }}</p>
         </div>
+        }
+      </div>
+
+      } @else if (hasError) {
+      <div class="empty-state">
+        <span class="material-symbols-outlined">error_outline</span>
+        <p>Erro ao carregar os dados da questão.</p>
+      </div>
       }
 
     </div>
 
+    <!-- ── Footer ──────────────────────────────────────────────────────── -->
     <div class="modal-footer">
       <button class="btn-primary" (click)="closePreview()">Fechar Visualização</button>
     </div>

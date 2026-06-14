@@ -1,135 +1,172 @@
 <div class="details-container">
 
   @if (isLoading) {
-  <div class="loading-state">
-    <span class="material-icons spinner">sync</span>
-    <p>A carregar detalhes do simulado...</p>
-  </div>
+    <div class="loading-state">
+      <span class="material-icons spinner">sync</span>
+      <p>A carregar detalhes do simulado...</p>
+    </div>
   } @else {
 
-  <header class="page-header">
-    <div class="header-content">
-      <button class="btn-back" routerLink="/dashboard">
-        <span class="material-icons">arrow_back</span> Voltar
+    <!-- ── Cabeçalho ──────────────────────────────────────────────────── -->
+    <header class="page-header">
+      <button class="btn-back" routerLink="/">
+        <span class="material-icons">arrow_back</span>
+        <span>Voltar</span>
       </button>
 
-      <div class="title-row">
-        @if (isEditingTitle) {
-        <div class="title-edit-mode">
-          <input type="text" class="custom-input" [(ngModel)]="editTitleValue" (keyup.enter)="saveTitle()" autoFocus>
-          <button class="btn-icon save" (click)="saveTitle()" title="Salvar"><span
-              class="material-icons">check</span></button>
-          <button class="btn-icon cancel" (click)="isEditingTitle = false" title="Cancelar"><span
-              class="material-icons">close</span></button>
+      <div class="header-content">
+        <div class="title-row">
+          @if (isEditingTitle) {
+            <div class="title-edit-mode">
+              <input
+                type="text"
+                class="title-input"
+                [(ngModel)]="editTitleValue"
+                (keyup.enter)="saveTitle()"
+                (keyup.escape)="cancelEditingTitle()"
+                autoFocus
+              />
+              <button class="btn-icon-sm save" (click)="saveTitle()" [disabled]="isSavingTitle" title="Salvar">
+                @if (isSavingTitle) {
+                  <span class="material-icons spin">sync</span>
+                } @else {
+                  <span class="material-icons">check</span>
+                }
+              </button>
+              <button class="btn-icon-sm cancel" (click)="cancelEditingTitle()" title="Cancelar">
+                <span class="material-icons">close</span>
+              </button>
+            </div>
+          } @else {
+            <div class="title-view-mode">
+              <h1 class="page-title">{{ simulationDetails?.title || 'Simulado Sem Título' }}</h1>
+              <button class="btn-edit-title" (click)="startEditingTitle()" title="Editar título">
+                <span class="material-icons">edit</span>
+              </button>
+            </div>
+          }
         </div>
-        } @else {
-        <div class="title-view-mode">
-          <h1 class="page-title">{{ simulationDetails?.title || 'Simulado Sem Título' }}</h1>
-          <button class="btn-edit-title" (click)="startEditingTitle()" title="Editar Título">
-            <span class="material-icons">edit</span>
-          </button>
+
+        <p class="page-subtitle">
+          Faça a gestão das questões deste simulado. Selecione questões específicas para iniciar um treino focado.
+        </p>
+
+        <div class="meta-row">
+          <span class="meta-pill">
+            <span class="material-icons">quiz</span>
+            {{ questions.length }} questões
+          </span>
         </div>
-        }
       </div>
 
-      <p class="page-subtitle">Faça a gestão das questões deste simulado. Pode selecionar questões específicas para
-        iniciar um treino focado.</p>
-    </div>
+      <div class="header-actions">
+        <button class="btn-secondary" (click)="openAddQuestionsSearch()">
+          <span class="material-icons">search</span>
+          <span>Adicionar Questões</span>
+        </button>
+      </div>
+    </header>
 
-    <div class="header-actions">
-      <button class="btn-secondary" (click)="openAddQuestionsSearch()">
-        <span class="material-icons">search</span> Adicionar Questões
-      </button>
-    </div>
-  </header>
-
-  <div class="bulk-action-bar" [class.has-selection]="selectedQuestions.size > 0">
-    <div class="selection-info">
-      <label class="custom-checkbox">
-        <input type="checkbox" [checked]="isAllSelected()" (change)="toggleAll()">
-        <span class="checkmark"></span>
+    <!-- ── Barra de seleção em massa ─────────────────────────────────────── -->
+    <div class="bulk-action-bar" [class.has-selection]="selectedQuestions.size > 0">
+      <label class="selection-info">
+        <div class="custom-checkbox">
+          <input type="checkbox" [checked]="isAllSelected()" (change)="toggleAll()" />
+          <span class="checkmark"></span>
+        </div>
+        <span class="selected-text">
+          @if (selectedQuestions.size > 0) {
+            <b>{{ selectedQuestions.size }}</b> selecionada(s) de {{ questions.length }}
+          } @else {
+            Selecionar tudo
+          }
+        </span>
       </label>
-      <span class="selected-text">
-        @if (selectedQuestions.size > 0) {
-        <b>{{ selectedQuestions.size }}</b> selecionadas de {{ questions.length }}
-        } @else {
-        Selecionar tudo
-        }
-      </span>
-    </div>
 
-    <div class="action-buttons">
-      <button class="btn-primary" [disabled]="selectedQuestions.size === 0 || isStartingSession"
-        (click)="startSelectedPractice()">
+      <button
+        class="btn-primary"
+        [disabled]="selectedQuestions.size === 0 || isStartingSession"
+        (click)="startSelectedPractice()"
+      >
         @if (isStartingSession) {
-        <span class="material-icons spinner">sync</span> Iniciando...
+          <span class="material-icons spin">sync</span>
+          <span>Iniciando...</span>
         } @else {
-        <span class="material-icons">play_arrow</span> Praticar Selecionadas
+          <span class="material-icons">play_arrow</span>
+          <span>Praticar Selecionadas</span>
         }
       </button>
     </div>
-  </div>
 
-  <section class="questions-list-section">
-    <div class="q-list">
-      @for (item of questions; track item.id; let i = $index) {
+    <!-- ── Lista de questões ──────────────────────────────────────────────── -->
+    <section class="questions-list-section">
+      <div class="q-list">
+        @for (item of questions; track item.id; let i = $index) {
+          @let qId = getQuestionId(item);
 
-      <label class="q-card-row" [class.selected]="selectedQuestions.has(item.question?.id || item.id)">
+          <label class="q-card-row" [class.selected]="selectedQuestions.has(qId)">
 
-        <div class="checkbox-col">
-          <div class="custom-checkbox">
-            <input type="checkbox" [checked]="selectedQuestions.has(item.question?.id || item.id)"
-              (change)="toggleSelection(item.question?.id || item.id)">
-            <span class="checkmark"></span>
+            <div class="checkbox-col">
+              <div class="custom-checkbox">
+                <input
+                  type="checkbox"
+                  [checked]="selectedQuestions.has(qId)"
+                  (change)="toggleSelection(qId)"
+                />
+                <span class="checkmark"></span>
+              </div>
+              <span class="q-order">{{ i + 1 }}</span>
+            </div>
+
+            <div class="q-main-col">
+              <div class="q-badges">
+                <span class="badge badge-area">{{ item.question?.area || 'Geral' }}</span>
+                @if (item.question?.exam?.year) {
+                  <span class="badge badge-subtle">ENEM {{ item.question.exam.year }}</span>
+                }
+                @if (item.question?.exam?.type) {
+                  <span class="badge badge-subtle">{{ item.question.exam.type }}</span>
+                }
+                @if (item.question?.skill?.code) {
+                  <span class="badge badge-skill">{{ item.question.skill.code }}</span>
+                }
+              </div>
+              <p class="q-snippet">{{ getSnippet(item) }}</p>
+            </div>
+
+            <div class="q-actions-col">
+              <button class="btn-icon view" (click)="openQuestionPreview(item, $event)" title="Visualizar">
+                <span class="material-icons">visibility</span>
+              </button>
+              <button class="btn-icon delete" (click)="removeQuestion(qId, $event)" title="Remover">
+                <span class="material-icons">delete</span>
+              </button>
+            </div>
+
+          </label>
+        } @empty {
+          <div class="empty-state">
+            <div class="empty-icon-wrap">
+              <span class="material-icons">assignment_late</span>
+            </div>
+            <h3>Simulado vazio</h3>
+            <p>Este simulado ainda não possui questões. Adicione novas questões para começar a praticar.</p>
+            <button class="btn-secondary" (click)="openAddQuestionsSearch()">
+              <span class="material-icons">search</span>
+              <span>Procurar Questões</span>
+            </button>
           </div>
-          <span class="q-order">{{ i + 1 }}</span>
-        </div>
-
-        <div class="q-main-col">
-          <div class="q-badges">
-            <span class="badge badge-area">{{ item.question?.area || 'Geral' }}</span>
-            @if (item.question?.exam?.year) { <span class="badge badge-subtle">ENEM {{ item.question.exam.year }}</span>
-            }
-          </div>
-          <p class="q-snippet">
-            {{ (item.question?.rawJson?.comando | slice:0:180) || 'Sem enunciado...' }}...
-          </p>
-        </div>
-
-        <div class="q-actions-col">
-          <button class="btn-icon view" (click)="openQuestionPreview(item, $event)" title="Visualizar">
-            <span class="material-icons">visibility</span>
-          </button>
-          <button class="btn-icon delete" (click)="removeQuestion(item.question?.id || item.id, $event)"
-            title="Remover">
-            <span class="material-icons">delete</span>
-          </button>
-        </div>
-
-      </label>
-
-      } @empty {
-
-      <div class="empty-state">
-        <div class="empty-icon-wrap"><span class="material-icons">assignment_late</span></div>
-        <h3>Simulado Vazio</h3>
-        <p>Este simulado ainda não possui questões. Adicione novas questões para começar a praticar.</p>
-        <button class="btn-secondary" (click)="openAddQuestionsSearch()">Procurar Questões</button>
+        }
       </div>
-
-      }
-    </div>
-  </section>
+    </section>
 
   }
-
 </div>
 
 @if (isPreviewModalOpen) {
-<app-question-preview [questionId]="previewQuestionId" (close)="closePreviewModal()"></app-question-preview>
+  <app-question-preview [questionId]="previewQuestionId" (close)="closePreviewModal()" />
 }
 
 @if (isSearchModalOpen) {
-<app-question-search-modal (close)="closeSearchModal()"
-  (addSelected)="addSelectedQuestions($event)"></app-question-search-modal>
+  <app-question-search-modal (close)="closeSearchModal()" (addSelected)="addSelectedQuestions($event)" />
 }

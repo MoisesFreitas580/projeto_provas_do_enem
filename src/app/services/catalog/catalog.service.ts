@@ -36,7 +36,7 @@ export class CatalogService {
     return this.$http.get<any>(`${this.catalog_url}knowledge-objects`, { params });
   }
 
-  // GET /catalog/contents
+  // // GET /catalog/contents [Não Usado]
   public getContents(params?: any): Observable<any> {
     return this.$http.get<any>(`${this.catalog_url}contents`, { params });
   }

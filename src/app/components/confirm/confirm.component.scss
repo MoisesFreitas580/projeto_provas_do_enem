@@ -1,0 +1,117 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+  padding: $space-lg;
+  box-sizing: border-box;
+}
+
+.confirm-dialog {
+  background: $bg-card;
+  border-radius: $radius-lg;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: $shadow-lg;
+  animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.confirm-header {
+  padding: $space-lg $space-lg 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  .icon-wrap {
+    width: 48px;
+    height: 48px;
+    background: $color-primary-pale;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: $space-md;
+  }
+
+  .material-icons {
+    font-size: 24px;
+    color: $color-primary;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: $text-heading;
+  }
+}
+
+.confirm-body {
+  padding: $space-md $space-lg $space-lg;
+  text-align: center;
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: $text-muted;
+    line-height: 1.5;
+  }
+}
+
+.confirm-footer {
+  padding: $space-md $space-lg;
+  background: $bg-app;
+  border-top: 1px solid $border-color;
+  display: flex;
+  justify-content: stretch;
+  gap: $space-md;
+
+  button {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: $radius-md;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition-fast;
+  }
+
+  .btn-cancel {
+    background: white;
+    border: 1px solid $border-color;
+    color: $text-heading;
+
+    &:hover {
+      background: $bg-subtle;
+    }
+  }
+
+  .btn-confirm {
+    @include btn-primary;
+    justify-content: center;
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
