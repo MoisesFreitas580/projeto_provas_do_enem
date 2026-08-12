@@ -4,6 +4,8 @@ import { Observable, map } from 'rxjs';
 import { SimulationsService } from '@services/simulations/simulations.service';
 import { Router, RouterLink } from '@angular/router';
 import { AttemptSessionsService } from '@services/attempt-sessions/attempt-sessions.service';
+import { ToastService } from '@components/toast/toast.component.service';
+import { ConfirmService } from '@components/confirm/confirm.component.service';
 
 export interface SimulationFilters {
   area?: string;
@@ -45,6 +47,8 @@ interface ApiResponse {
 export class UserSimulationsComponent implements OnInit {
   private simulationsService     = inject(SimulationsService);
   private attemptSessionsService = inject(AttemptSessionsService);
+  private toastService           = inject(ToastService);
+  private confirmService         = inject(ConfirmService);
   private router                 = inject(Router);
 
   public userSimulations$!: Observable<SimulationItem[]>;
@@ -65,7 +69,7 @@ export class UserSimulationsComponent implements OnInit {
   }
 
   public startSimulation(sim: SimulationItem): void {
-    if (this.startingSessionId) return; 
+    if (this.startingSessionId) return;
     this.startingSessionId = sim.id;
 
     const payload = {
@@ -79,7 +83,7 @@ export class UserSimulationsComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erro ao iniciar simulado:', err);
-        alert('Erro ao preparar o seu simulado. Tente novamente.');
+        this.toastService.show('Erro ao preparar o seu simulado. Tente novamente.', 'error');
         this.startingSessionId = null;
       },
     });
@@ -90,11 +94,19 @@ export class UserSimulationsComponent implements OnInit {
     this.router.navigate(['/simulations-details', sim.id]);
   }
 
-  public deleteSimulation(id: string, event: Event): void {
+  public async deleteSimulation(id: string, event: Event): Promise<void> {
     event.stopPropagation();
-    if (window.confirm('Tem a certeza que deseja excluir este simulado permanentemente?')) {
-      alert('Exclusão ativada (preparado para o backend).');
-    }
+
+    const confirmed = await this.confirmService.ask(
+      'Excluir Simulado',
+      'Tem a certeza que deseja excluir este simulado permanentemente?',
+      'Sim, Excluir',
+      'Cancelar'
+    );
+    if (!confirmed) return;
+
+    // TODO: chamar o endpoint real assim que DELETE /simulations/:id existir na API
+    this.toastService.show('Exclusão ainda não disponível — endpoint pendente no backend.', 'info');
   }
 
   private fetchUserSimulations(): void {

@@ -6,6 +6,8 @@ import { SimulationsService } from '@services/simulations/simulations.service';
 import { AttemptSessionsService } from '@services/attempt-sessions/attempt-sessions.service';
 import { QuestionPreviewComponent } from '@components/questions-preview/questions-preview.component';
 import { QuestionSearchModalComponent } from '@components/question-search-modal/question-search-modal.component';
+import { ToastService } from '@components/toast/toast.component.service';
+import { ConfirmService } from '@components/confirm/confirm.component.service';
 
 @Component({
   selector: 'app-simulations-details',
@@ -15,13 +17,15 @@ import { QuestionSearchModalComponent } from '@components/question-search-modal/
   imports: [CommonModule, RouterLink, FormsModule, QuestionPreviewComponent, QuestionSearchModalComponent],
 })
 export class SimulationsDetailsComponent implements OnInit {
-  private route               = inject(ActivatedRoute);
-  private router              = inject(Router);
-  private simulationsService  = inject(SimulationsService);
-  private attemptService      = inject(AttemptSessionsService);
-  private cdr                 = inject(ChangeDetectorRef);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private simulationsService = inject(SimulationsService);
+  private attemptService = inject(AttemptSessionsService);
+  private cdr = inject(ChangeDetectorRef);
+  private toastService = inject(ToastService);
+  private confirmService = inject(ConfirmService);
 
-  public isLoading         = true;
+  public isLoading = true;
   public isStartingSession = false;
   public simulationId: string | null = null;
 
@@ -30,13 +34,13 @@ export class SimulationsDetailsComponent implements OnInit {
 
   public isEditingTitle = false;
   public editTitleValue = '';
-  public isSavingTitle  = false;
+  public isSavingTitle = false;
 
   public selectedQuestions = new Set<string>();
 
   public isPreviewModalOpen = false;
-  public previewQuestionId  = '';
-  public isSearchModalOpen  = false;
+  public previewQuestionId = '';
+  public isSearchModalOpen = false;
 
   ngOnInit(): void {
     this.simulationId = this.route.snapshot.paramMap.get('simulationId');
@@ -46,9 +50,13 @@ export class SimulationsDetailsComponent implements OnInit {
 
   private fetchQuestions(): void {
     this.isLoading = true;
-    this.simulationsService.getSimulationQuestions(this.simulationId!).subscribe({
+    this.simulationsService.getSimulationById(this.simulationId!).subscribe({
       next: (res: any) => {
         this.simulationDetails = res.simulation || res.data?.simulation || res;
+      },
+    });
+    this.simulationsService.getSimulationQuestions(this.simulationId!).subscribe({
+      next: (res: any) => {
         this.questions = res.questions || res.items || res.data?.questions || [];
         this.editTitleValue = this.simulationDetails?.title || '';
         this.selectedQuestions.clear();
@@ -56,7 +64,7 @@ export class SimulationsDetailsComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: () => {
-        alert('Erro ao carregar os detalhes do simulado.');
+        this.toastService.show('Erro ao carregar os detalhes do simulado.', 'error');
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -83,11 +91,11 @@ export class SimulationsDetailsComponent implements OnInit {
       next: () => {
         this.simulationDetails.title = value;
         this.isEditingTitle = false;
-        this.isSavingTitle  = false;
+        this.isSavingTitle = false;
         this.cdr.detectChanges();
       },
       error: () => {
-        alert('Erro ao atualizar o título.');
+        this.toastService.show('Erro ao atualizar o título.', 'error');
         this.isSavingTitle = false;
         this.cdr.detectChanges();
       },
@@ -134,7 +142,7 @@ export class SimulationsDetailsComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erro ao iniciar treino avulso:', err);
-        alert('Erro ao preparar o simulado. Tente novamente.');
+        this.toastService.show('Erro ao preparar o simulado. Tente novamente.', 'error');
         this.isStartingSession = false;
         this.cdr.detectChanges();
       },
@@ -142,10 +150,17 @@ export class SimulationsDetailsComponent implements OnInit {
   }
 
 
-  public removeQuestion(questionId: string, event: Event): void {
+  public async removeQuestion(questionId: string, event: Event): Promise<void> {
     event.stopPropagation();
     event.preventDefault();
-    if (!confirm('Deseja realmente remover esta questão do simulado?')) return;
+
+    const confirmed = await this.confirmService.ask(
+      'Remover Questão',
+      'Deseja realmente remover esta questão do simulado?',
+      'Sim, Remover',
+      'Cancelar'
+    );
+    if (!confirmed) return;
 
     this.simulationsService.removeQuestionFromSimulation(this.simulationId!, questionId).subscribe({
       next: () => {
@@ -153,24 +168,24 @@ export class SimulationsDetailsComponent implements OnInit {
         this.selectedQuestions.delete(questionId);
         this.cdr.detectChanges();
       },
-      error: () => alert('Erro ao remover questão.'),
+      error: () => this.toastService.show('Erro ao remover questão.', 'error'),
     });
   }
 
   public openQuestionPreview(item: any, event: Event): void {
     event.stopPropagation();
     event.preventDefault();
-    this.previewQuestionId  = this.getQuestionId(item);
+    this.previewQuestionId = this.getQuestionId(item);
     this.isPreviewModalOpen = true;
   }
 
 
   public openAddQuestionsSearch(): void { this.isSearchModalOpen = true; }
-  public closeSearchModal(): void       { this.isSearchModalOpen = false; }
+  public closeSearchModal(): void { this.isSearchModalOpen = false; }
 
   public closePreviewModal(): void {
     this.isPreviewModalOpen = false;
-    this.previewQuestionId  = '';
+    this.previewQuestionId = '';
   }
 
   public addSelectedQuestions(questionIds: string[]): void {
@@ -180,7 +195,7 @@ export class SimulationsDetailsComponent implements OnInit {
     this.simulationsService.addQuestionsToSimulation(this.simulationId!, { questionIds }).subscribe({
       next: () => this.fetchQuestions(),
       error: () => {
-        alert('Ocorreu um erro ao vincular as questões.');
+        this.toastService.show('Ocorreu um erro ao vincular as questões.', 'error');
         this.isLoading = false;
         this.cdr.detectChanges();
       },

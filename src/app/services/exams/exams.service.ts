@@ -33,13 +33,13 @@ export class ExamsService {
     return this.$http.get<ExamsResponse>(this.base_url, { params });
   }
 
-  // GET /exams/questions?type=PPL&year=2015&day=D1
+  // GET /exams/questions?type=PPL&year=2015&day=D1 [Não usado]
   public getExamQuestions(filters: ExamFilters): Observable<any[]> {
     const params = this.buildParams(filters);
     return this.$http.get<any[]>(`${this.base_url}/questions`, { params });
   }
 
-  // GET /exams/:id/questions
+  // GET /exams/:id/questions [Não Usado]
   public getExamQuestionsById(id: string): Observable<any[]> {
     return this.$http.get<any[]>(`${this.base_url}/${id}/questions`);
   }
