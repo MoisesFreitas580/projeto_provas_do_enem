@@ -6,6 +6,7 @@ import { AttemptSessionsService } from '@services/attempt-sessions/attempt-sessi
 import { from, concatMap, toArray, finalize } from 'rxjs';
 import { ToastService } from '@components/toast/toast.component.service';
 import { ConfirmService } from '@components/confirm/confirm.component.service';
+import { QuestionContentService, QuestionView } from '@services/questions/question-content.service';
 
 interface QuestionState {
   isSeen: boolean;
@@ -14,7 +15,6 @@ interface QuestionState {
   entryTime: number | null;
 }
 
-/** Deve bater com o `data` configurado em app.routes.ts para cada variação de sessão. */
 export interface AttemptSessionRouteData {
   idParam: string;
   defaultTitle: string;
@@ -29,32 +29,34 @@ export interface AttemptSessionRouteData {
   styleUrls: ['./attempt-sessions.component.scss']
 })
 export class AttemptSessionComponent implements OnInit, OnDestroy {
-  private route           = inject(ActivatedRoute);
-  private router          = inject(Router);
-  private attemptService  = inject(AttemptSessionsService);
-  private cdr             = inject(ChangeDetectorRef);
-  private toastService    = inject(ToastService);
-  private confirmService  = inject(ConfirmService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private attemptService = inject(AttemptSessionsService);
+  private cdr = inject(ChangeDetectorRef);
+  private toastService = inject(ToastService);
+  private confirmService = inject(ConfirmService);
+  private questionContent = inject(QuestionContentService);
 
-  public sessionId: string    = '';
+
+  public sessionId: string = '';
   public sessionTitle: string = '';
-  public finishLabel: string  = 'Concluir';
+  public finishLabel: string = 'Concluir';
 
-  public questions: any[] = [];
+  public questions: QuestionView[] = [];
   public currentQuestionIndex: number = 0;
 
-  public isLoading: boolean    = true;
+  public isLoading: boolean = true;
   public isSubmitting: boolean = false;
 
   public answersCache: Record<string, QuestionState> = {};
 
   ngOnInit(): void {
-    const data    = this.route.snapshot.data as Partial<AttemptSessionRouteData>;
+    const data = this.route.snapshot.data as Partial<AttemptSessionRouteData>;
     const idParam = data['idParam'] || 'sessionId';
 
-    this.sessionId    = this.route.snapshot.paramMap.get(idParam) || '';
+    this.sessionId = this.route.snapshot.paramMap.get(idParam) || '';
     this.sessionTitle = data['defaultTitle'] || 'Sessão de Treino';
-    this.finishLabel  = data['finishLabel'] || 'Concluir';
+    this.finishLabel = data['finishLabel'] || 'Concluir';
 
     if (this.sessionId) this.loadSession();
   }
@@ -73,7 +75,9 @@ export class AttemptSessionComponent implements OnInit, OnDestroy {
         if (res?.title) this.sessionTitle = res.title;
 
         if (res && res.answers) {
-          this.questions = res.answers.map((ans: any) => ans.question);
+          this.questions = res.answers.map((ans: any) =>
+            this.questionContent.toView(ans.question),
+          );
 
           res.answers.forEach((ans: any) => {
             this.answersCache[ans.questionId] = {
@@ -179,7 +183,6 @@ export class AttemptSessionComponent implements OnInit, OnDestroy {
       next: () => {
         this.isSubmitting = false;
         this.toastService.show('Sessão corrigida com sucesso!', 'success');
-        // TODO: navegar para uma página de resultados quando ela existir (ex: /resultados/:id)
         this.router.navigate(['/']);
       },
       error: () => {
@@ -211,5 +214,14 @@ export class AttemptSessionComponent implements OnInit, OnDestroy {
     if (state.selectedAlternativeId) return 'answered';
     if (state.isSeen) return 'seen';
     return 'unseen';
+  }
+
+  public onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.style.display = 'none';
+    img.insertAdjacentHTML(
+      'afterend',
+      '<p class="image-error">Não foi possível carregar a imagem.</p>',
+    );
   }
 }
