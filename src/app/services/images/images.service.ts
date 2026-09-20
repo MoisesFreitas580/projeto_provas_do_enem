@@ -3,7 +3,7 @@ import { environment } from '@environments/environments';
 
 @Injectable({ providedIn: 'root' })
 export class ImagesService {
-  private readonly base_url = environment.image + 'images/path/';
+  private readonly base_url = environment.api + 'images/path/';
 
   public buildUrl(path?: string | null): string | null {
     console.log('Building image URL for path:', path);
