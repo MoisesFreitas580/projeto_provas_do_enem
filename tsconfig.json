@@ -38,6 +38,9 @@
       ],
       "@environments/*": [
         "./src/environments/*"
+      ],
+      "@models/*": [
+        "./src/app/models/*"
       ]
     }
   },

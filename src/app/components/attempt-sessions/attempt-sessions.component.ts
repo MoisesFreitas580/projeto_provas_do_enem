@@ -183,7 +183,7 @@ export class AttemptSessionComponent implements OnInit, OnDestroy {
       next: () => {
         this.isSubmitting = false;
         this.toastService.show('Sessão corrigida com sucesso!', 'success');
-        this.router.navigate(['/']);
+        this.router.navigate(['/resultado', this.sessionId]);
       },
       error: () => {
         this.isSubmitting = false;

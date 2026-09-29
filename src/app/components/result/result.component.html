@@ -1,0 +1,113 @@
+@if (isLoading()) {
+  <div class="state-container">
+    <div class="spinner"></div>
+    <p>Carregando resultado da sua sessão...</p>
+  </div>
+} @else if (hasError() || !resultData()) {
+  <div class="state-container error">
+    <p>Não foi possível carregar o resultado da sessão.</p>
+    <button class="btn-secondary" (click)="sessionId() && carregarResultado(sessionId()!)">Tentar Novamente</button>
+  </div>
+} @else {
+  <div class="result-page">
+    <header class="header-container">
+      <div class="header-content">
+        <button type="button" class="btn-back" (click)="goBack()">
+          <span class="material-icons">arrow_back</span>
+          Voltar
+        </button>
+
+        <div class="title-group">
+          <h1 class="page-title">Resultado da Prova</h1>
+          
+          <p class="page-description">
+            Confira o seu desempenho detalhado, quantidade de acertos e análise das questões respondidas.
+          </p>
+
+          <div class="badge-pill">
+            <span class="material-icons">assignment</span>
+            <span>Simulado — Manual</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Conteúdo central com largura padronizada -->
+    <main class="result-content">
+      <!-- Placar de Cards -->
+      <div class="score-cards">
+        <div class="card correct">
+          <span class="card-label">Acertos</span>
+          <span class="card-value">{{ resultData()?.correctQuestions ?? 0 }}</span>
+        </div>
+
+        <div class="card wrong">
+          <span class="card-label">Erros</span>
+          <span class="card-value">{{ resultData()?.wrongQuestions ?? 0 }}</span>
+        </div>
+
+        <div class="card skipped">
+          <span class="card-label">Em Branco</span>
+          <span class="card-value">{{ resultData()?.skippedQuestions ?? 0 }}</span>
+        </div>
+      </div>
+
+      <!-- Lista de Questões -->
+      <section class="review-section">
+        <h2>Revisão das Questões</h2>
+
+        <div class="questions-list">
+          @for (answer of resultData()?.answers; track $index) {
+            <div class="review-card" [class]="answer.correctionStatus | lowercase">
+              <div class="card-top">
+                <div class="question-meta">
+                  <span class="q-number">Questão {{ $index + 1 }}</span>
+                  <span class="status-badge" [class]="answer.correctionStatus | lowercase">
+                    @switch (answer.correctionStatus) {
+                      @case ('CORRECT') { ✅ Correta }
+                      @case ('WRONG') { ❌ Incorreta }
+                      @case ('SKIPPED') { ⏭️ Em Branco }
+                      @case ('ANNULLED') { ⚠️ Anulada }
+                      @case ('MISSING_ANSWER_KEY') { ❓ Sem Gabarito }
+                    }
+                  </span>
+                </div>
+
+                <div class="answers-info">
+                  <span class="ans-pill user">
+                    Sua Resposta: <strong>{{ answer.selectedLetter || '-' }}</strong>
+                  </span>
+                  <span class="ans-pill correct">
+                    Gabarito: <strong>{{ answer.correctLetter || '-' }}</strong>
+                  </span>
+                </div>
+              </div>
+
+              <div class="card-bottom">
+                <button class="btn-view-preview" (click)="abrirPreview(answer.question)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                    <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                  </svg>
+                  Ver Questão e Enunciado
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    </main>
+  </div>
+
+  @if (selectedQuestion()) {
+    <div class="modal-backdrop" (click)="fecharPreview()">
+      <div class="modal-wrapper" (click)="$event.stopPropagation()">
+        <app-question-preview
+          [questionId]="selectedQuestion().id"
+          (close)="fecharPreview()"
+          (closeModal)="fecharPreview()">
+        </app-question-preview>
+      </div>
+    </div>
+  }
+}
