@@ -70,7 +70,16 @@ export const routes: Routes = [
     component: SimulationsDetailsComponent,
     canActivate: [authGuard],
   },
-  { path: 'statistics', component: StatisticsComponent },
+  { 
+    path: 'statistics', 
+    component: StatisticsComponent, 
+    canActivate: [authGuard], 
+  },
+  {
+    path: 'resultado/:sessionId',
+    loadComponent: () => import('@components/result/result.component').then(m => m.ResultComponent),
+    canActivate: [authGuard]
+  },
   {
     path: '**',
     redirectTo: '',
