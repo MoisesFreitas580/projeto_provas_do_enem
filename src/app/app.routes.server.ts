@@ -8,6 +8,7 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'attempt-sessions-exam/:examId', renderMode: RenderMode.Server },
   { path: 'attempt-sessions-simulation/:sessionId', renderMode: RenderMode.Server },
   { path: 'attempt-sessions-avulso/:avulsoId', renderMode: RenderMode.Server },
+  { path: 'resultado/:sessionId', renderMode: RenderMode.Server },
 
   {
     path: '**',
